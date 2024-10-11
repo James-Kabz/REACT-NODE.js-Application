@@ -1,19 +1,30 @@
 "use strict";
+const Role = require("../model/Role");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("users", {
-      user_id: {
+      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      user_email: {
+      roleId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: {
+            tableName: "roles",
+          },
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      email: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true, // Ensure user_email is unique
       },
       password: {
         type: Sequelize.STRING,
@@ -27,14 +38,12 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal(
-          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-        ),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("users");
+    await queryInterface.dropTable("users"); // Corrected table name
   },
 };

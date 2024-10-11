@@ -2,8 +2,7 @@ const {where} = require("sequelize")
 const db = require('../model/dbConnect')
 const createHttpError = require("http-errors")
 const games = db.games
-    const path = require('path');
-const fs = require('fs');
+
 
 module.exports = {
     addGame: async (req, res, next) => {
@@ -15,8 +14,7 @@ module.exports = {
                 image:req.body.image
             }
 
-            const addGame = await
-                games.create(info)
+            const addGame = await games.create(info)
             res.status(200).send(addGame)
         } catch (error) {
             next(error)

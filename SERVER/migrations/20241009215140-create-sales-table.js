@@ -3,8 +3,8 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("sales_tbs", {
-      sale_id: {
+    await queryInterface.createTable("sales", {
+      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -15,8 +15,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "games", // Name of the referenced table
-          key: "game_id", // Key in the referenced table
+          model: {
+            tableName : "games"
+
+          },
+          key : "game_id"
         },
         onUpdate: "CASCADE", // Update behavior
         onDelete: "CASCADE", // Delete behavior
