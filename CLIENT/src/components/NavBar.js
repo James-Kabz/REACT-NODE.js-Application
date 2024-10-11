@@ -22,33 +22,48 @@ const Navbar = () => {
     };
 
     return (
-        <div>
-            <nav className="navbar bg-blue-950 flex flex-col lg:flex-row w-full items-center ml-0 p-7 top-0 z-20 fixed">
-                {/* Left section */}
-                <div className="mr-0 lg:mr-5">
-                    <h1 className="text-2xl lg:text-3xl text-white">Welcome</h1>
-                </div>
-                <div className="form">
-                    <form className="flex items-center" onSubmit={handleSearch}>
-                        <input 
-                            type="date" 
-                            placeholder="Search by Date" 
-                            className="bg-gray-100 border border-gray-100 rounded-md py-2 ml-0 lg:ml-60 px-0 lg:px-80  text-dark-900focus:outline-none focus:ring focus:border-blue-300"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button type="submit" className="ml-2 bg-lime-700 text-white rounded-xl p-2">Search</button>
-                    </form>
-                </div>
+      <div>
+        <nav className="navbar bg-blue-950 flex flex-col lg:flex-row items-center justify-between p-5 lg:p-7 w-full top-0 z-20 fixed shadow-lg">
+          {/* Left Section - Welcome Message */}
+          <div className="mb-4 lg:mb-0">
+            <h1 className="text-2xl lg:text-3xl text-white font-bold">
+              Welcome
+            </h1>
+          </div>
 
-                <div className="ml-0 lg:ml-64">
-                    <button className="bg-lime-700 text-white rounded-xl p-2 ml-3" onClick={handleLogout}>
-                        Log Out
-                    </button>
-                </div>            
+          {/* Search Form */}
+          <div className="flex-grow">
+            <form
+              className="flex items-center justify-center lg:justify-start"
+              onSubmit={handleSearch}
+            >
+              <input
+                type="date"
+                placeholder="Search by Date"
+                className="bg-gray-100 border border-gray-300 rounded-md py-2 px-4 w-full lg:w-96 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition duration-300 ease-in-out"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="ml-2 bg-lime-700 text-white font-semibold rounded-md py-2 px-4 hover:bg-lime-600 transition duration-300 ease-in-out"
+              >
+                Search
+              </button>
+            </form>
+          </div>
 
-            </nav>
-        </div>
+          {/* Logout Button */}
+          <div className="mt-4 lg:mt-0">
+            <button
+              className="bg-lime-700 text-white font-semibold rounded-md py-2 px-4 hover:bg-lime-600 transition duration-300 ease-in-out"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
+          </div>
+        </nav>
+      </div>
     );
 };
 

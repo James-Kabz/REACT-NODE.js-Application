@@ -39,30 +39,51 @@ const UserForm = () => {
   };
 
   return (
-    <div className='flex items-center justify-center h-screen'>
-      <form onSubmit={handleRegistration} className="flex flex-col items-center justify-center shadow-2xl shadow-blue-500 p-10 gap-4">
-        <h1 className='text-2xl text-center font-bold mb-4'> User Registration</h1>
-        <label>Email :</label>
-        <input
-          type="text"
-          placeholder="Enter Your Email"
-          value={data.user_email}
-          name='user_email'
-          onChange={handleChange}
-          className="input-field mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
-        />
-        <label>Password :</label>
-        <input
-          type="password"
-          placeholder="Enter Your Password"
-          value={data.password}
-          name='password'
-          onChange={handleChange}
-          className="input-field mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
-        />
-        <button type="submit" className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <form
+        onSubmit={handleRegistration}
+        className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg flex flex-col items-center gap-6"
+      >
+        <h1 className="text-3xl font-bold text-blue-700 mb-6">
+          User Registration
+        </h1>
+
+        {/* Email Input */}
+        <div className="w-full">
+          <label className="block text-gray-700 font-medium mb-2">Email:</label>
+          <input
+            type="email"
+            placeholder="Enter Your Email"
+            value={data.user_email}
+            name="user_email"
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 mb-4"
+          />
+        </div>
+
+        {/* Password Input */}
+        <div className="w-full">
+          <label className="block text-gray-700 font-medium mb-2">
+            Password:
+          </label>
+          <input
+            type="password"
+            placeholder="Enter Your Password"
+            value={data.password}
+            name="password"
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 mb-6"
+          />
+        </div>
+
+        {/* Register Button */}
+        <button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-300 focus:outline-none focus:ring focus:ring-blue-200"
+        >
           Register
         </button>
+
         <ToastContainer />
       </form>
     </div>

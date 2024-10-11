@@ -5,22 +5,22 @@ import Home from "./components/Home";
 import Sidebar from "./components/sideBar";
 import SalesPage from "./components/sales";
 import { AuthProvider, useAuth } from "./components/AuthContext";
-import LoginForm from "./components/loginAdmin";
-import RegistrationForm from "./components/registerForm";
+import LoginForm from "./components/loginUsers";
 import ReportsData from "./components/reportForm";
 import UserForm from "./components/userRegForm";
-import LoginUserForm from "./components/loginUser";
 import MakeSaleForm from "./components/customers";
-import { ToastContainer } from 'react-toastify'; 
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import DataPage from "./components/Data";
 import ForgotPasswordForm from "./components/ForgotPassword";
 import ResetPasswordForm from "./components/ResetPassword";
+import PermissionsPage from "./components/permissions";
+import RolesPage from "./components/roles";
 function App() {
   return (
     <AuthProvider>
       <AppContent />
-      <ToastContainer/>
+      <ToastContainer />
     </AuthProvider>
   );
 }
@@ -30,33 +30,27 @@ function AppContent() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/loginAdmin">
+        <Route exact path="/loginUsers">
           <LoginForm />
         </Route>
-        <Route path="/registerForm">
-          <RegistrationForm />
-        </Route>
-        <Route path="/loginUser">
-          <LoginUserForm/>
-        </Route>
         <Route path="/userRegForm">
-          <UserForm/>
+          <UserForm />
         </Route>
         <Route path="/ForgotPassword">
-          <ForgotPasswordForm/>
+          <ForgotPasswordForm />
         </Route>
         <Route path="/ResetPassword">
-          <ResetPasswordForm/>
+          <ResetPasswordForm />
         </Route>
         <Route path="/">
           {isLoggedIn ? (
-            userRole === "admin" ? (
+            userRole === "super-admin" ? (
               <AdminDashboard />
             ) : (
               <UserDashboard />
             )
           ) : (
-            <Redirect to="/loginAdmin" />
+            <Redirect to="/loginUsers" />
           )}
         </Route>
       </Switch>
@@ -72,7 +66,13 @@ function AdminDashboard() {
         <Navbar />
         <Switch>
           <Route exact path="/dashboard">
-            <Home/>
+            <Home />
+          </Route>
+          <Route path="/permissions">
+            <PermissionsPage />
+          </Route>
+          <Route path="/roles">
+            <RolesPage />
           </Route>
           <Route path="/sales">
             <SalesPage />
@@ -80,11 +80,11 @@ function AdminDashboard() {
           <Route path="/reportForm">
             <ReportsData />
           </Route>
-           <Route path="/customers">
-            <MakeSaleForm/>
+          <Route path="/customers">
+            <MakeSaleForm />
           </Route>
           <Route path="/Data">
-            <DataPage/>
+            <DataPage />
           </Route>
           <Redirect to="/dashboard" />
         </Switch>
@@ -101,13 +101,19 @@ function UserDashboard() {
         <Navbar />
         <Switch>
           <Route exact path="/dashboard">
-            <Home/>
+            <Home />
+          </Route>
+          <Route path="/roles">
+            <RolesPage />
           </Route>
           <Route path="/sales">
             <SalesPage />
           </Route>
           <Route path="/customers">
-            <MakeSaleForm/>
+            <MakeSaleForm />
+          </Route>
+          <Route path="/permissions">
+            <PermissionsPage />
           </Route>
           {/* <Redirect to="/sales" /> */}
         </Switch>
@@ -117,6 +123,3 @@ function UserDashboard() {
 }
 
 export default App;
-
-
-
