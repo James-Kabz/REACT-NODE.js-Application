@@ -1,51 +1,61 @@
+// const { RolePermission, Role, Permission } = require("../model/dbConnect"); // Adjust path to your models
 const { where } = require("sequelize");
-const createHttpError = require("http-errors");
 const db = require("../model/dbConnect");
-const RolePermissions = require("../model/RolePermissions");
-const RolePermission = db.rolePermissions; // Assuming you have defined this in your db connection
-const Role = db.roles; // Import Role model
-const Permission = db.permissions; // Import Permission model
+const createHttpError = require("http-errors");
+const roles = db.roles;
+const permissions = db.permissions;
+const rolePermissions = db.rolePermissions;
 
+// Assign a permission to a role
 module.exports = {
-  // Assign permission to a role
   assignPermissionToRole: async (req, res, next) => {
     try {
       const { roleId, permissionId } = req.body;
-      const rolePermission = await RolePermissions.create({
-        roleId,
-        permissionId,
+
+      // Check if the role already has the permission
+      const existingPermission = await rolePermissions.findOne({
+        where: {
+          roleId: roleId,
+          permissionId: permissionId,
+        },
       });
-      res.status(201).json(rolePermission);
+
+      if (existingPermission) {
+        // If permission already exists, return a message and skip creating a new one
+        return res.status(200).json({
+          message: `Permission with ID ${permissionId} is already assigned to role with ID ${roleId}.`,
+        });
+      }
+
+      // If permission doesn't exist, proceed with creating it
+      const assignPermissionToRole = await rolePermissions.create({
+        roleId: roleId,
+        permissionId: permissionId,
+      });
+
+      return res.status(201).json(assignPermissionToRole);
     } catch (error) {
-      next(createHttpError(500, "Failed to assign permission to role"));
+      next(error);
     }
   },
 
-  // Get all permissions assigned to a role
+  // Get all permissions for a specific role
   getPermissionsForRole: async (req, res, next) => {
-    try {
-      const { roleId } = req.params;
-      const rolePermissions = await RolePermission.findAll({
-        where: { roleId },
-        include: [{ model: Permission, as: "permission" }],
-      });
-      res.status(200).json(rolePermissions);
-    } catch (error) {
-      next(createHttpError(500, "Failed to retrieve role permissions"));
-    }
-  },
+    // const { roleId } = req.params;
 
-  // Get all roles assigned to a permission
-  getRolesForPermission: async (req, res, next) => {
     try {
-      const { permissionId } = req.params;
-      const permissionRoles = await RolePermission.findAll({
-        where: { permissionId },
-        include: [{ model: Role, as: "role" }],
+      let id = req.params.roleId;
+      let RolePermission = await rolePermissions.findAll({
+        where: {
+          roleId: id,
+        },
       });
-      res.status(200).json(permissionRoles);
+      if (!roles) {
+        throw createHttpError(404, "Permissions To Role Not Found");
+      }
+      res.status(201).send(RolePermission);
     } catch (error) {
-      next(createHttpError(500, "Failed to retrieve permission roles"));
+      next(error);
     }
   },
 
@@ -53,18 +63,31 @@ module.exports = {
   removePermissionFromRole: async (req, res, next) => {
     try {
       const { roleId, permissionId } = req.body;
-      const rolePermission = await RolePermission.findOne({
-        where: { roleId, permissionId },
+
+      // Find the permission entry
+      const permission = await rolePermissions.findOne({
+        where: {
+          roleId: roleId,
+          permissionId: permissionId,
+        },
       });
-      if (!rolePermission) {
-        return next(
-          createHttpError(404, "Role-Permission association not found")
-        );
+
+      // If it doesn't exist, return an error
+      if (!permission) {
+        return res.status(404).json({
+          message: `Permission with ID ${permissionId} is not assigned to role with ID ${roleId}.`,
+        });
       }
-      await rolePermission.destroy();
-      res.status(204).send();
+
+      // Remove the permission from the role
+      await permission.destroy();
+
+      return res.status(200).json({
+        message: `Permission with ID ${permissionId} has been removed from role with ID ${roleId}.`,
+      });
     } catch (error) {
-      next(createHttpError(500, "Failed to remove permission from role"));
+      next(error);
     }
   },
+  
 };

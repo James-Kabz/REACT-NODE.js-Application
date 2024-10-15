@@ -14,6 +14,7 @@ const RolesPage = () => {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const [currentRoleId, setCurrentRoleId] = useState(null);
+  const [previousPermissions, setPreviousPermissions] = useState([]);
 
   useEffect(() => {
     fetchRoles();
@@ -120,9 +121,12 @@ const RolesPage = () => {
   const fetchPermissionsForRole = async (roleId) => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/role-permission/role/${roleId}`
+        `http://localhost:4000/api/rolePermission/getPermissionsForRole/${roleId}`
       );
-      setSelectedPermissions(response.data.map((p) => p.roleId)); // Assuming permissions are returned in the response
+
+      setPreviousPermissions(response.data.map((p) => p.permissionId)); // Save previous permissions
+      // Extract permission IDs from the response
+      setSelectedPermissions(response.data.map((p) => p.permissionId)); // Adjust according to API response
     } catch (error) {
       toast.error("Failed to fetch permissions for the role");
     }
@@ -130,14 +134,69 @@ const RolesPage = () => {
 
   const assignPermissionsToRole = async () => {
     try {
-      await axios.post("http://localhost:4000/api/role-permission", {
-        roleId: currentRoleId,
-        permissionId: selectedPermissions,
-      });
-      toast.success("Permissions assigned to role successfully!");
+      let successCount = 0;
+      let skipCount = 0;
+      let removedCount = 0;
+
+      // Assuming you have arrays: `selectedPermissions` (currently selected)
+      // and `previousPermissions` (permissions before the update)
+
+      // Get the permissions that were deselected
+      const deselectedPermissions = previousPermissions.filter(
+        (permissionId) => !selectedPermissions.includes(permissionId)
+      );
+
+      // Assign new permissions
+      for (let permissionId of selectedPermissions) {
+        const response = await axios.post(
+          "http://localhost:4000/api/rolePermission/assignPermissionToRole",
+          {
+            roleId: currentRoleId,
+            permissionId,
+          }
+        );
+
+        // Check if the permission was newly added or already exists
+        if (response.data.message?.includes("already assigned")) {
+          skipCount++;
+        } else {
+          successCount++;
+        }
+      }
+
+      // Remove deselected permissions
+      for (let permissionId of deselectedPermissions) {
+        const response = await axios.delete(
+          "http://localhost:4000/api/rolePermission/removePermissionFromRole",
+          {
+            data: {
+              roleId: currentRoleId,
+              permissionId,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          removedCount++;
+        }
+      }
+
+      // Display appropriate toast messages based on results
+      if (successCount > 0) {
+        toast.success(
+          `permissions updated successfully!`
+        );
+      }
+      // if (skipCount > 0) {
+      //   toast.info(`${skipCount} permissions were already assigned.`);
+      // }
+      if (removedCount > 0) {
+        toast.success(`permissions removed from the role.`);
+      }
+
       closePermissionModal();
     } catch (error) {
-      toast.error("Failed to assign permissions to role");
+      toast.error("Failed to update permissions for the role");
     }
   };
 
@@ -222,7 +281,7 @@ const RolesPage = () => {
           <div key={permission.id} className="flex items-center mb-2">
             <input
               type="checkbox"
-              checked={selectedPermissions.includes(permission.permissionId)}
+              checked={selectedPermissions.includes(permission.id)} // Correct ID comparison
               onChange={() => togglePermission(permission.id)}
               className="mr-2"
             />
@@ -254,7 +313,7 @@ const RolesPage = () => {
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <h3 className="text-lg font-bold mb-4">Confirm Deletion</h3>
-        <p>Are you sure you want to delete the role "{roleToDelete?.name}"?</p>
+        <p>Are you sure you want to delete the role "{roleToDelete?.roleName}"?</p>
         <div className="mt-4 flex justify-end">
           <button
             onClick={closeDeleteModal}
@@ -275,6 +334,5 @@ const RolesPage = () => {
     </div>
   );
 };
-
 
 export default RolesPage;

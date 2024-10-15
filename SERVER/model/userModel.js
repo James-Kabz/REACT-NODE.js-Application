@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { type, keys } = require("../helpers/validateUser");
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("users", {
     id: {
@@ -10,9 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     roleId: {
       type: DataTypes.INTEGER,
       references: {
-        model: {
-          tableName: "roles",
-        },
+        model: "roles",
         key: "id",
       },
     },
@@ -27,26 +25,20 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  User.beforeCreate(async (users) => {
-    try {
-      const salt = await bcrypt.genSalt(16);
-      const hashedPwd = await bcrypt.hash(users.password, salt);
-      users.password = hashedPwd;
-    } catch (error) {
-      throw new Error("Error encrypting Password");
-    }
+  // Hash password before saving to database
+  User.beforeCreate(async (user) => {
+    const salt = await bcrypt.genSalt(16);
+    user.password = await bcrypt.hash(user.password, salt);
   });
 
+  // Validate password method
   User.prototype.isValidPassword = async function (password) {
-    try {
-      return await bcrypt.compare(password, this.password);
-    } catch (error) {
-      throw new Error("Error validating password");
-    }
+    return await bcrypt.compare(password, this.password);
   };
 
+  // Define relationships
   User.associate = (models) => {
-    User.belongsTo(models.Role, { foreignKey: "roleId", as: "role" }); // A user belongs to a role
+    User.belongsTo(models.Role, { foreignKey: "roleId", as: "role" });
   };
 
   return User;

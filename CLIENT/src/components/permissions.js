@@ -9,15 +9,26 @@ const PermissionModal = ({ isOpen, onClose, onSave, permission }) => {
   useEffect(() => {
     if (permission) {
       setPermissionName(permission.permissionName); // Set the permission name for editing
-    } else {
+    } else if (isOpen){
       setPermissionName(""); // Reset for adding new permission
     }
-  }, [permission]);
+  }, [permission,isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(permission ? permission.id : null, permissionName);
-    onClose(); // Close modal after saving
+    if (!permissionName) {
+      toast.error("Permission Name cannot be empty");
+      return;
+    }
+
+    if(permission){
+      onSave(permission.id, permissionName);
+    } else{
+      onSave(permissionName)
+    }
+
+    onClose(); //close the modal
+ 
   };
 
   return (
@@ -59,7 +70,6 @@ const PermissionsPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
 
-  // Fetch permissions from the API
   const fetchPermissions = async () => {
     try {
       const response = await axios.get("http://localhost:4000/api/permissions");
@@ -69,14 +79,13 @@ const PermissionsPage = () => {
     }
   };
 
-  // Add a new permission
   const addPermission = async (permissionName) => {
     try {
       await axios.post("http://localhost:4000/api/permissions", {
-        name: permissionName,
+        permissionName, 
       });
       toast.success("Permission added successfully!");
-      fetchPermissions(); // Refresh the list
+      fetchPermissions();
     } catch (error) {
       toast.error("Failed to add permission");
     }

@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       roleId: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
           model: "roles",
           key: "id",
@@ -13,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       permissionId: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
           model: "permissions",
           key: "id",
@@ -22,19 +24,18 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      timestamps: false, // Disable timestamps
+      timestamps: false,
+      freezeTableName: true, // Prevents Sequelize from pluralizing table names
     }
   );
 
-  // Define associations between RolePermission and Permission, Role
+  // Define relationships
   RolePermission.associate = (models) => {
+    RolePermission.belongsTo(models.Role, { foreignKey: "roleId", as: "role" });
+    // RolePermission model
     RolePermission.belongsTo(models.Permission, {
       foreignKey: "permissionId",
       as: "permission",
-    });
-    RolePermission.belongsTo(models.Role, {
-      foreignKey: "roleId",
-      as: "role",
     });
   };
 

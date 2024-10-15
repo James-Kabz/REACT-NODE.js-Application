@@ -8,9 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     game_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: {
-          tableName: "games",
-        },
+        model: "games", // Specify the model name as a string
         key: "game_id",
       },
       onDelete: "CASCADE", // Optional: Defines behavior on deletion
@@ -28,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
+
+  Sale.associate = (models) => {
+    Sale.belongsTo(models.Game, { foreignKey: "game_id", as: "game" }); // Association to Game
+  };
 
   return Sale;
 };

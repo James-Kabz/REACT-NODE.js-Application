@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      timestamps: true, // Enable timestamps (createdAt, updatedAt)
+      timestamps: true, // Enable createdAt and updatedAt
     }
   );
 

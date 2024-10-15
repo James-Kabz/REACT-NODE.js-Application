@@ -3,13 +3,13 @@ const db = require("../model/dbConnect");
 const Permission = db.permissions; // Ensure you import the correct model
 
 module.exports = {
-
   createPermission: async (req, res, next) => {
     try {
       const { permissionName } = req.body;
       const permission = await Permission.create({ permissionName });
       res.status(201).json(permission);
     } catch (error) {
+      console.error(error); // Log the actual error to the server console
       next(createHttpError(500, "Failed to create permission"));
     }
   },

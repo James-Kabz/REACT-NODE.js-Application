@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const userRoute = require('./routes/userRoute')
+const userRoute = require("./routes/userRoute");
 const saleRoute = require("./routes/saleRoute");
 const gameRoute = require("./routes/gameRoute");
 const roleRoute = require("./routes/RoleRoute");

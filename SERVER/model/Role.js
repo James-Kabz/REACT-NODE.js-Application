@@ -15,12 +15,13 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      timestamps: true, // Enable timestamps (createdAt, updatedAt)
+      timestamps: true, // Enable createdAt and updatedAt
     }
   );
 
+  // Define relationships
   Role.associate = (models) => {
-    Role.hasMany(models.User, {foreignKey : "roleId"})
+    Role.hasMany(models.User, { foreignKey: "roleId", as: "users" });
   };
 
   return Role;
