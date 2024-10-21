@@ -2,41 +2,33 @@ import {
   BrowserRouter as Route,
   Switch,
 } from "react-router-dom/cjs/react-router-dom.min";
-import Dashboard from "./dashboard";
-import SalesPage from "./sales";
+import Dashboard from "./Dashboard";
 import { BrowserRouter } from "react-router-dom/cjs/react-router-dom";
-import ReportsData from "./reportForm";
-import MakeSaleForm from "./customers";
-import PermissionsPage from "./permissions";
-import RolesPage from "./roles";
+import ReportsData from "./AnalyticsPage";
+import PermissionsPage from "./Permissions";
+import RolesPage from "./Roles";
 // import LoginForm from "./loginUsers";
 
 const Home = () => {
   return (
     <div>
       <BrowserRouter>
-        <div className="bg-dark-400">
+        <div className="">
           <Switch>
             {/* <Route exact path="/loginUsers">
                 <LoginForm />
               </Route> */}
 
-            <Route path="/permissions">
+            <Route path="/Permissions">
               <PermissionsPage />
             </Route>
-            <Route path="/roles">
+            <Route path="/Roles">
               <RolesPage />
             </Route>
-            <Route path="/dashboard">
+            <Route path="/Dashboard">
               <Dashboard />
             </Route>
-            <Route path="/sales">
-              <SalesPage />
-            </Route>
-            <Route path="/customers">
-              <MakeSaleForm />
-            </Route>
-            <Route path="/reportForm">
+            <Route path="/AnalyticsPage">
               <ReportsData />
             </Route>
           </Switch>

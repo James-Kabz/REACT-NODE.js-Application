@@ -1,5 +1,6 @@
 const db = require("../model/dbConnect");
 const users = db.users;
+const Role = db.roles;
 const createHttpError = require("http-errors");
 const { signAccessToken, signRefreshToken } = require("../helpers/jwtHelpers");
 const authSchema = require("../helpers/validateSchema");
@@ -30,26 +31,48 @@ module.exports = {
     }
   },
 
-  loginUser: async (req, res, next) => {
+  fetchRoleName: async (req, res, next) => {
     try {
-      const result = await authSchema.validateAsync(req.body);
-      const user = await users.findOne({ where: { email: result.email } });
+      const { id } = req.params;
+      const role = await Role.findByPk(id);
 
-      if (!user) throw createHttpError.NotFound("User not found");
+      // Check if the role exists
+      if (!role) {
+        throw createHttpError(404, "Role not found");
+      }
 
-      // Password check
-      const isMatch = await user.isValidPassword(result.password);
-      if (!isMatch) throw createHttpError.Unauthorized("Invalid password");
-
-      // Generate tokens
-      const accessToken = await signAccessToken(user.id, ); // Pass roleId to token
-      const refreshToken = await signRefreshToken(user.userId);
-
-      res.send({ accessToken, refreshToken }); // Include roleId in response
+      res.status(200).send(role); // Change 201 to 200 for successful retrieval
     } catch (error) {
-      if (error.isJoi === true)
-        return next(createHttpError.BadRequest("Invalid Credentials"));
-      next(error);
+      // Handle Joi validation errors, if applicable
+      if (error.isJoi === true) {
+        return next(createHttpError(400, "Invalid Credentials")); // Use 400 for bad requests
+      }
+      next(error); // Pass any other errors to the error handler
     }
   },
+
+  
+loginUser: async (req, res, next) => {
+  try {
+    const result = await authSchema.validateAsync(req.body);
+    const user = await users.findOne({ where: { email: result.email } });
+
+    if (!user) throw createHttpError.NotFound("User not found");
+
+    // Password check
+    const isMatch = await user.isValidPassword(result.password);
+    if (!isMatch) throw createHttpError.Unauthorized("Invalid password");
+
+    // Generate tokens
+    const accessToken = await signAccessToken(user.id, user.roleId); // Include roleId if necessary
+    const refreshToken = await signRefreshToken(user.id); // Adjusted to use user.id
+
+    // Send roleId along with tokens
+    res.send({ accessToken, refreshToken, roleId: user.roleId }); // Include roleId in response
+  } catch (error) {
+    if (error.isJoi === true)
+      return next(createHttpError.BadRequest("Invalid Credentials"));
+    next(error);
+  }
+},
 };

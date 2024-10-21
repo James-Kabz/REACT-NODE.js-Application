@@ -120,7 +120,7 @@ const PermissionsPage = () => {
   }, []);
 
   return (
-    <div className="p-8 mt-32">
+    <div className="max-w-6xl mx-auto mt-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-white">
       <h2 className="text-2xl font-semibold mb-4">Permissions</h2>
       <button
         onClick={() => {

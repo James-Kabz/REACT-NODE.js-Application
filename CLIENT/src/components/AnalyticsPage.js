@@ -54,11 +54,13 @@ function GameShop() {
     setShowDeleteModal(false);
   };
 
+  
+
   return (
-    <div className="dashboa p-5 mt-48 lg:mt-28">
-      <div className="container font-serif">
+    <div className="p-5 mt-10 lg:mt-2">
+      <div className="font-serif">
         <h1 className="text-3xl font-bold mb-6 text-center">Sales Reports</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 sm:max-w-screen-2xl lg:max-w-full gap-10 p-5">
           {records.map((game, index) => (
             <div key={index} className="rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition duration-1000 ease-out bg-gray-100 shadow-gray-600 p-6 ">
               <h2 className="text-4xl font-semibold mb-3">{game.game_name}</h2>

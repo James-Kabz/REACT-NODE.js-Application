@@ -187,9 +187,9 @@ const RolesPage = () => {
           `permissions updated successfully!`
         );
       }
-      // if (skipCount > 0) {
-      //   toast.info(`${skipCount} permissions were already assigned.`);
-      // }
+      if (skipCount > 0) {
+        toast.info(`permissions were already assigned.`);
+      }
       if (removedCount > 0) {
         toast.success(`permissions removed from the role.`);
       }
@@ -215,7 +215,7 @@ const RolesPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-32 p-5 border border-gray-300 rounded-lg shadow-lg bg-white">
+    <div className="max-w-4xl max-h-7xl mx-auto mt-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-white">
       <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
         Manage Roles
       </h2>

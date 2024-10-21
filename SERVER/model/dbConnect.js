@@ -52,8 +52,8 @@ db.sequelize.sync({ force: false }).then(() => {
   console.log("re-sync done");
 });
 
-// db.games.hasMany(db.sales, { foreignKey: "game_id" });
-// db.sales.belongsTo(db.games, { foreignKey: "game_id" });
+db.games.hasMany(db.sales, { foreignKey: "game_id" });
+db.sales.belongsTo(db.games, { foreignKey: "game_id" });
 // db.users.belongsTo(db.roles, { foreignKey: "roleId" });
 // // db.roles.hasMany(db.users, { foreignKey : "id"})
 
