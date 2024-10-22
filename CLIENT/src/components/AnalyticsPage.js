@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditGame from './EditGame';
-import DeleteGame from './deleteGame';
+import DeleteGame from './DeleteGame';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -38,12 +38,12 @@ function GameShop() {
 
   const handleUpdateGame = async () => {
     await fetchGamesData();
-    toast.success('Game updated successfully!');
+    toast.success('Item updated successfully!');
   };
 
-  const handleDeleteGame = async () => {
+  const handleDelete = async () => {
     await fetchGamesData();
-    toast.success('Game deleted successfully!');
+    toast.success('Item deleted successfully!');
   };
 
   const handleCloseUpdateModal = () => {
@@ -75,14 +75,14 @@ function GameShop() {
           ))}
         </div>
         <div className="mt-6 bg-gray-600 rounded-lg shadow-md p-6 text-white">
-          <h2 className="text-3xl font-semibold mb-3">Total Value of Games in Stock</h2>
+          <h2 className="text-3xl font-semibold mb-3">Total Value of Items in Stock</h2>
           <p className="text-2xl">KES {totalValue}</p>
         </div>
       </div>
       {showUpdateModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80">
           <div className="bg-white p-9 mt-5 lg:ml-20 rounded-lg max-w-sm lg:max-w-3xl w-full">
-            <h2 className="text-3xl font-bold text-center mt-44 lg:mt-auto">Update Game</h2>
+            <h2 className="text-3xl font-bold text-center mt-44 lg:mt-auto">Update Item</h2>
             <EditGame game={selectedGame} onClose={handleCloseUpdateModal} onUpdate={handleUpdateGame} />
           </div>
         </div>
@@ -90,8 +90,8 @@ function GameShop() {
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
           <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-3">Delete Game</h2>
-            <DeleteGame game={selectedGame} onClose={handleCloseDeleteModal} onDelete={handleDeleteGame} />
+            <h2 className="text-xl font-semibold mb-3">Delete Item</h2>
+            <DeleteGame game={selectedGame} onClose={handleCloseDeleteModal} onDelete={handleDelete} />
           </div>
         </div>
       )}

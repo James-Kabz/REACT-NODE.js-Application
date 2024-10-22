@@ -34,7 +34,7 @@ const EditGame = ({ game, onClose, onUpdate }) => {
 
   return (
    <form onSubmit={handleSubmit} className="w-full text-gray-900 lg:mt-0">
-  <label className="block mt-3 text-xl lg:text-4xl font-bold">Game Name:</label>
+  <label className="block mt-3 text-xl lg:text-4xl font-bold">Item Name:</label>
   <input
     type="text"
     className="w-full mb-6 p-2 lg:p-5 bg-gray-200 rounded-md"

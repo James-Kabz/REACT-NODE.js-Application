@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext"; // Import useAuth hook
 import { ToastContainer, toast } from "react-toastify"; // Import toast for notifications
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for toast notifications
+import { FaShoppingCart } from "react-icons/fa";
+
 
 const GameShop = () => {
   const [records, setGamesData] = useState([]);
@@ -12,7 +14,8 @@ const GameShop = () => {
     game_name: "",
     price: "",
     image: "",
-  }); // State to hold new game data
+    quantity_in_stock: "",
+  });
   const [cart, setCart] = useState(() => {
     // Load cart from localStorage
     const savedCart = localStorage.getItem("cart");
@@ -39,7 +42,7 @@ const GameShop = () => {
         "http://localhost:4000/api/game/addGame",
         newGameData
       );
-      console.log("New game added:", response.data);
+      // console.log("New game added:", response.data);
 
       // Refresh the game list
       axios
@@ -47,10 +50,10 @@ const GameShop = () => {
         .then((response) => setGamesData(response.data))
         .catch((error) => console.error("Error fetching data:", error));
       setShowAddGameModal(false);
-      toast.success("Game added successfully!"); // Show success message
+      toast.success("Item added successfully!");
     } catch (error) {
-      console.error("Error adding game:", error);
-      toast.error("Error adding game."); // Show error message
+      // console.error("Error adding game:", error);
+      toast.error("Error adding game.");
     }
   };
 
@@ -145,24 +148,33 @@ const GameShop = () => {
         <h1 className="text-3xl font-bold mb-6 mt-5 lg:mt-4 text-center">
           DashBoard
         </h1>
-        {(userRole === "super-admin" || userRole === "admin") && (
+        <div className="flex justify-between items-center mb-3">
+          {(userRole === "super-admin" || userRole === "admin") && (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => setShowAddGameModal(true)}
+            >
+              Add Item
+            </button>
+          )}
+
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-3 rounded"
-            onClick={() => setShowAddGameModal(true)}
+            className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded relative"
+            onClick={() => setShowCart(true)} 
           >
-            Add Game
+            <FaShoppingCart className="mr-2" />
+            View Cart
+            <span className="ml-2 bg-red-600 text-white rounded-full w-6 h-6 text-center leading-6 text-sm absolute -top-2 -right-2">
+              {cart.length}
+            </span>
           </button>
-        )}
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mb-3 rounded"
-          onClick={() => setShowCart(true)} // Show cart
-        >
-          View Cart ({cart.length})
-        </button>
+        </div>
+
+        {/* Games Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 sm:max-w-screen-2xl lg:max-w-full gap-10 p-5">
           {records.map((game) => (
             <div
-              key={game.game_id} // Use unique game_id
+              key={game.game_id}
               className="rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition duration-1000 ease-out bg-gray-100 shadow-gray-700 p-6"
             >
               <h2 className="text-4xl font-semibold mb-3 text-opacity-100">
@@ -178,7 +190,7 @@ const GameShop = () => {
                 style={{ width: "100%", height: "400px", objectFit: "cover" }}
               />
               <button
-                onClick={() => handleAddToCart(game)} // Add game to cart
+                onClick={() => handleAddToCart(game)} 
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               >
                 Add to Cart
@@ -252,20 +264,36 @@ const GameShop = () => {
             className="bg-white p-16 lg:p-15 mt-44 lg:mt-20 rounded-lg"
             style={{ width: "800px", height: "auto" }}
           >
-            <h2 className="text-3xl font-bold mb-6">Add New Game</h2>
+            <h2 className="text-3xl font-bold mb-6">Add New Item</h2>
             <form onSubmit={handleAddGame}>
               <div className="mb-6">
                 <label
                   htmlFor="game_name"
                   className="block text-2xl font-bold mb-2"
                 >
-                  Game Name
+                  Item Name
                 </label>
                 <input
                   type="text"
                   id="game_name"
                   name="game_name"
                   value={newGameData.game_name}
+                  onChange={handleNewGameDataChange}
+                  className="input-field w-full p-4 bg-gray-200 rounded-md"
+                />
+              </div>
+              <div className="mb-6">
+                <label
+                  htmlFor="game_name"
+                  className="block text-2xl font-bold mb-2"
+                >
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  id="quantity_in_stock"
+                  name="quantity_in_stock"
+                  value={newGameData.quantity_in_stock}
                   onChange={handleNewGameDataChange}
                   className="input-field w-full p-4 bg-gray-200 rounded-md"
                 />
@@ -307,7 +335,7 @@ const GameShop = () => {
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 >
-                  Add Game
+                  Add Item
                 </button>
               </div>
             </form>
