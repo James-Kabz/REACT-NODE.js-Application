@@ -6,15 +6,29 @@ module.exports = {
     const bcrypt = require("bcrypt");
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash("@Kabzngarang254", 10);
+    const hashedPassword = await bcrypt.hash("@kabz123", 10);
 
-    // Add seed commands here
+    // Insert the role first
     await queryInterface.bulkInsert(
-      "admins",
+      "roles",
       [
         {
-          admin_email: "kabogp@gmail.com",
-          password: hashedPassword, // Use the hashed password
+          roleName: "super-admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      {}
+    );
+
+    // Then insert the user and reference the roleId
+    await queryInterface.bulkInsert(
+      "users",
+      [
+        {
+          roleId: 1, // Assuming 1 is the role ID for "super-admin"
+          email: "kabogp@gmail.com",
+          password: hashedPassword,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -24,7 +38,8 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Add commands to revert seed here
-    await queryInterface.bulkDelete("admins", null, {});
+    // Delete users first, then roles to maintain foreign key constraints
+    await queryInterface.bulkDelete("users", null, {});
+    await queryInterface.bulkDelete("roles", null, {});
   },
 };

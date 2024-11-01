@@ -5,11 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    game_id: {
+    item_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "games", // Specify the model name as a string
-        key: "game_id",
+        model: "items", // Specify the model name as a string
+        key: "id",
       },
       onDelete: "CASCADE", // Optional: Defines behavior on deletion
     },
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Sale.associate = (models) => {
-    Sale.belongsTo(models.Game, { foreignKey: "game_id", as: "game" }); // Association to Game
+    Sale.belongsTo(models.Item, { foreignKey: "item_id", as: "item" }); // Association to Game
   };
 
   return Sale;

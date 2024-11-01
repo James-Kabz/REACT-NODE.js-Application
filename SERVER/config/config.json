@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "",
-    "database": "gamepos_api",
+    "database": "e-commerce",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

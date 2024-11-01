@@ -1,12 +1,12 @@
 import React from "react";
 import axios from "axios";
 
-const DeleteGame = ({ game, onClose, onDelete }) => {
+const DeleteItem = ({ item, onClose, onDelete }) => {
   const token = sessionStorage.getItem("accessToken","refreshToken");
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/game/deleteGame/${game.game_id}`, {
+      await axios.delete(`http://localhost:4000/api/item/deleteItem/${item.item_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -31,4 +31,4 @@ const DeleteGame = ({ game, onClose, onDelete }) => {
   );
 };
 
-export default DeleteGame;
+export default DeleteItem;

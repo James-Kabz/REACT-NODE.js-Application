@@ -4,7 +4,6 @@ import Navbar from "./components/NavBar";
 import Home from "./components/Home";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import LoginForm from "./components/Login";
-import ReportsData from "./components/AnalyticsPage";
 import UserForm from "./components/RegistrationForm";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +12,7 @@ import ForgotPasswordForm from "./components/ForgotPassword";
 import ResetPasswordForm from "./components/ResetPassword";
 import PermissionsPage from "./components/Permissions";
 import RolesPage from "./components/Roles";
+import CommerceShop from "./components/AnalyticsPage";
 
 function App() {
   return (
@@ -66,13 +66,13 @@ function Dashboard({ userRole }) {
             <>
               <Route path="/Permissions" component={PermissionsPage} />
               <Route path="/Roles" component={RolesPage} />
-              <Route path="/AnalyticsPage" component={ReportsData} />
+              <Route path="/AnalyticsPage" component={CommerceShop} />
               <Route path="/Data" component={DataPage} />
             </>
           )}
           {userRole === "admin" && (
             <>
-              <Route path="/AnalyticsPage" component={ReportsData} />
+              <Route path="/AnalyticsPage" component={CommerceShop} />
             </>
           )}
           {userRole === "user" && (

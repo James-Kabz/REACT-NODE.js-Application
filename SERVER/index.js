@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
-const userRoute = require("./routes/userRoute");
-const saleRoute = require("./routes/saleRoute");
-const gameRoute = require("./routes/gameRoute");
+const userRoute = require("./routes/UserRoute");
+const saleRoute = require("./routes/SaleRoute");
+const itemRoute = require("./routes/ItemRoute");
 const roleRoute = require("./routes/RoleRoute");
 const permissionRoute = require("./routes/PermissionRoute");
 const rolePermissionRoute = require("./routes/RolePermissionRoute");
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRoute);
 app.use("/api/sale", saleRoute);
-app.use("/api/game", gameRoute);
+app.use("/api/item", itemRoute);
 app.use("/api/roles", roleRoute);
 app.use("/api/permissions", permissionRoute);
 app.use("/api/rolePermission", rolePermissionRoute);

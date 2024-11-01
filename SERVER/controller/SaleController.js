@@ -1,31 +1,31 @@
 const db = require("../model/dbConnect");
 const sales = db.sales;
-// const {Game}  = require('../model/gamesModel')
-const games = db.games;
+const items = db.items;
+
 module.exports = {
   makeSale: async (req, res, next) => {
     try {
       let info = {
         quantity_sold: req.body.quantity_sold,
         total_price: req.body.total_price,
-        game_id: req.body.game_id,
+        item_id: req.body.item_id,
         sale_date: req.body.sale_date,
       };
 
-      const game = await games.findOne({ where: { game_id: info.game_id } });
-      if (!game) {
-        return res.status(404).send({ message: "Game not found" });
+      const item = await items.findOne({ where: { id: info.item_id } });
+      if (!item) {
+        return res.status(404).send({ message: "Item not found" });
       }
 
-      if (info.quantity_sold > game.quantity_in_stock) {
+      if (info.quantity_sold > item.quantity_in_stock) {
         return res
           .status(400)
           .send({ message: "Quantity sold exceeds quantity in stock" });
       }
 
-      await games.decrement("quantity_in_stock", {
+      await items.decrement("quantity_in_stock", {
         by: info.quantity_sold,
-        where: { game_id: info.game_id },
+        where: { id: info.item_id },
       });
       const makeSale = await sales.create(info);
 
@@ -40,15 +40,29 @@ module.exports = {
       let getAllSales = await sales.findAll({
         include: [
           {
-            model: games,
-            attributes: ["game_name"],
+            model: items,
+            attributes: ["item_name"],
           },
         ],
-        order: [
-          ["sale_date", "DESC"], // Sort by sale_date in descending order
-        ],
+        order: [["sale_date", "DESC"]],
       });
       res.status(200).send(getAllSales);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  deleteSale: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+
+      const deleteSale = await sales.destroy({ where: { id: id } });
+
+      if (deleteSale === 0) {
+        throw createHttpError(404, "Sale not found");
+      }
+
+      res.status(200).json({ message: "Sale deleted successfully" });
     } catch (error) {
       next(error);
     }

@@ -2,7 +2,7 @@ import {
   BrowserRouter as Route,
   Switch,
 } from "react-router-dom/cjs/react-router-dom.min";
-import Dashboard from "./Dashboard";
+import ECommerceShop from "./Dashboard";
 import { BrowserRouter } from "react-router-dom/cjs/react-router-dom";
 import ReportsData from "./AnalyticsPage";
 import PermissionsPage from "./Permissions";
@@ -26,7 +26,7 @@ const Home = () => {
               <RolesPage />
             </Route>
             <Route path="/Dashboard">
-              <Dashboard />
+              <ECommerceShop />
             </Route>
             <Route path="/AnalyticsPage">
               <ReportsData />

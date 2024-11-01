@@ -7,7 +7,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 });
 
 // Import models
-const User = require("./userModel")(sequelize, DataTypes);
+const User = require("./User")(sequelize, DataTypes);
 const Role = require("./Role")(sequelize, DataTypes);
 // const Permission = require("./Permission")(sequelize, DataTypes);
 // const RolePermission = require("./RolePermissions")(sequelize, DataTypes);
@@ -41,9 +41,9 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require("./userModel")(sequelize, DataTypes);
+db.users = require("./User")(sequelize, DataTypes);
 db.sales = require("./Sale")(sequelize, DataTypes);
-db.games = require("./Games")(sequelize, DataTypes);
+db.items = require("./Items")(sequelize, DataTypes);
 db.roles = require("./Role")(sequelize, DataTypes);
 db.permissions = require("./Permission")(sequelize, DataTypes);
 db.rolePermissions = require("./RolePermissions")(sequelize, DataTypes);
@@ -52,10 +52,10 @@ db.sequelize.sync({ force: false }).then(() => {
   console.log("re-sync done");
 });
 
-db.games.hasMany(db.sales, { foreignKey: "game_id" });
-db.sales.belongsTo(db.games, { foreignKey: "game_id" });
-// db.users.belongsTo(db.roles, { foreignKey: "roleId" });
-// // db.roles.hasMany(db.users, { foreignKey : "id"})
+db.items.hasMany(db.sales, { foreignKey: "item_id" });
+db.sales.belongsTo(db.items, { foreignKey: "item_id" });
+db.users.belongsTo(db.roles, { foreignKey: "roleId" });
+db.roles.hasMany(db.users, { foreignKey : "id"})
 
 
 module.exports = { RolePermission, Permission, sequelize };
