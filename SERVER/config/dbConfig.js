@@ -1,7 +1,7 @@
 module.exports = {
-    HOST: "localhost",
-    USER: "root",
-    PASSWORD: "",
-    DB: "gamepos_api",
-    dialect: "mysql"
+  HOST: "localhost",
+  USER: "root",
+  PASSWORD: "",
+  DB: "e-commerce",
+  dialect: "mysql",
 };

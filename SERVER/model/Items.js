@@ -1,11 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
-  const Game = sequelize.define("games", {
-    game_id: {
+  const Item = sequelize.define("items", {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    game_name: {
+    item_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -23,9 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Game.associate = (models) => {
-    Game.hasMany(models.Sale, { foreignKey: "game_id", as: "sales" }); // Association to Sales
+  Item.associate = (models) => {
+    Item.hasMany(models.Sale, { foreignKey: "item_id", as: "items" }); // Association to Sales
   };
 
-  return Game;
+  return Item;
 };

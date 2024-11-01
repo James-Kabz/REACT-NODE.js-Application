@@ -10,16 +10,16 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
-      game_id: {
-        // Adding foreign key for game_id
+      item_id: {
+        // Adding foreign key for item_id
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: {
-            tableName : "games"
+            tableName : "items"
 
           },
-          key : "game_id"
+          key : "id"
         },
         onUpdate: "CASCADE", // Update behavior
         onDelete: "CASCADE", // Delete behavior
@@ -52,6 +52,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("sales_tbs");
+    await queryInterface.dropTable("sales");
   },
 };
