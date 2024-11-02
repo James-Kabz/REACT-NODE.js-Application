@@ -6,7 +6,7 @@ const DeleteItem = ({ item, onClose, onDelete }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/item/deleteItem/${item.item_id}`, {
+      await axios.delete(`http://localhost:4000/api/item/deleteItem/${item.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

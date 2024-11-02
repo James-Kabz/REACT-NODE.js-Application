@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import Navbar from "./components/NavBar";
 import Home from "./components/Home";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import LoginForm from "./components/Login";
-import UserForm from "./components/RegistrationForm";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DataPage from "./components/Data";
@@ -13,8 +12,22 @@ import ResetPasswordForm from "./components/ResetPassword";
 import PermissionsPage from "./components/Permissions";
 import RolesPage from "./components/Roles";
 import CommerceShop from "./components/AnalyticsPage";
+import LoadingSpinner from "./components/LoadingSpinner";
+import "./Loading.css";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  // const [data, setData] = useState(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
   return (
     <AuthProvider>
       <AppContent />
@@ -31,9 +44,6 @@ function AppContent() {
       <Switch>
         <Route exact path="/Login">
           <LoginForm />
-        </Route>
-        <Route path="/RegistrationForm">
-          <UserForm />
         </Route>
         <Route path="/ForgotPassword">
           <ForgotPasswordForm />
@@ -57,7 +67,7 @@ function Dashboard({ userRole }) {
   return (
     <div>
       <Navbar />
-      <div className="flex-grow ml-0 lg:ml-60 bg-blue-gray-900">
+      <div className="flex-grow p-10 bg-blue-gray-900">
         <Switch>
           <Route exact path="/Dashboard">
             <Home />
@@ -72,13 +82,13 @@ function Dashboard({ userRole }) {
           )}
           {userRole === "admin" && (
             <>
+              <Route path="/Permissions" component={PermissionsPage} />
+              <Route path="/Roles" component={RolesPage} />
+              <Route path="/Data" component={DataPage} />
               <Route path="/AnalyticsPage" component={CommerceShop} />
             </>
           )}
-          {userRole === "user" && (
-            <>
-            </>
-          )}
+          {userRole === "user" && <></>}
           <Redirect to="/Dashboard" />
         </Switch>
       </div>

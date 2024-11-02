@@ -4,9 +4,10 @@ import { AuthContext } from "./AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 
 const LoginForm = () => {
+  const [loading, setLoading] = useState(false); // Set loading to false initially
   const { login, refreshToken } = useContext(AuthContext);
   const [data, setLoginData] = useState({
     email: "",
@@ -24,65 +25,96 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (loading) return; // Prevent multiple submissions
+
     try {
-      if (data.email.length === 0 || !data.email.includes("@")) {
-        toast.error("Enter a valid email", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000,
-        });
-      } else if (data.password.length < 8) {
+      if (!data.email || !data.email.includes("@")) {
+        toast.error("Enter a valid email", { autoClose: 3000 });
+        return;
+      }
+      if (data.password.length < 8) {
         toast.error("Password must be at least 8 characters", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000,
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
         });
-      } else {
-        const response = await axios.post(
-          "http://localhost:4000/api/user/loginUser",
-          data
-        );
-        if (response.status === 200) {
-          const {
-            accessToken,
-            refreshToken: newRefreshToken,
-            roleId,
-          } = response.data;
+        return;
+      }
 
-          sessionStorage.setItem("accessToken", accessToken);
-          sessionStorage.setItem("refreshToken", newRefreshToken);
-          sessionStorage.setItem("userRole", roleId); // Store roleId or role name
+      setLoading(true); // Start loading
 
-          login(roleId); // Pass the role to the login function in context
-          history.replace("/dashboard");
+      const response = await axios.post(
+        "http://localhost:4000/api/user/loginUser",
+        data
+      );
 
-          toast.success(`Login Successful. Welcome`, {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 3000,
-          });
-        } else if (response.status === 401) {
-          const newAccessToken = await refreshToken();
+      if (response.status === 200) {
+        const {
+          accessToken,
+          refreshToken: newRefreshToken,
+          roleId,
+        } = response.data;
 
-          if (newAccessToken) {
-            await handleLogin(e);
-          } else {
-            toast.error("Invalid username/password", {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 3000,
-            });
-          }
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("refreshToken", newRefreshToken);
+        sessionStorage.setItem("userRole", roleId);
+
+        login(roleId);
+        history.replace("/dashboard");
+
+        toast.success("Login Successful. Welcome", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
+        });
+      } else if (response.status === 401) {
+        const newAccessToken = await refreshToken();
+
+        if (newAccessToken) {
+          await handleLogin(e);
         } else {
-          console.error("Authentication Failed");
-          toast.error("Authentication Failed", {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 3000,
+          toast.error("Invalid username/password", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            draggable: true,
+            newestOnTop: true,
           });
         }
+      } else {
+        toast.error("Authentication Failed", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Invalid username/password", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 3000,
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        newestOnTop: true,
       });
+    } finally {
+      setLoading(false); // Stop loading after all processes are completed
     }
   };
 
@@ -121,20 +153,18 @@ const LoginForm = () => {
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 mb-6"
         />
 
-        {/* Login Button */}
+        {/* Login Button with Conditional Loader */}
         <button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-300 focus:outline-none focus:ring focus:ring-blue-200 mb-4"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition duration-300 focus:outline-none focus:ring focus:ring-blue-200 mb-4 flex items-center justify-center"
+          disabled={loading} // Disable button when loading
         >
-          Login
+          {loading ? (
+            <FaSpinner className="animate-spin mr-2" /> // Loading spinner icon
+          ) : (
+            "Login"
+          )}
         </button>
-
-        {/* Link to User Login */}
-        <div className="text-center">
-          <Link to="/loginUser" className="text-blue-500 hover:underline">
-            Login as User
-          </Link>
-        </div>
 
         <ToastContainer />
       </form>

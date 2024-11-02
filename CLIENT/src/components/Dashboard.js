@@ -4,18 +4,19 @@ import { useAuth } from "./AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaShoppingCart } from "react-icons/fa";
+import LoadingSpinner from "./LoadingSpinner";
 
 const ECommerceShop = () => {
   const [records, setItemsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { userRole } = useAuth();
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [gameDetails, setGameDetails] = useState({});
-  const [newItemData, setNewItemData] = useState({
-    item_name: "",
-    price: "",
-    image: "",
-    quantity_in_stock: "",
-  });
+  // const [newItemData, setNewItemData] = useState({
+  //   item_name: "",
+  //   price: "",
+  //   image: "",
+  //   quantity_in_stock: "",
+  // });
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -28,10 +29,29 @@ const ECommerceShop = () => {
   const RAWG_API_KEY = "48c8f1dcb24a41298c867ab063f3f85f"; // Replace with your RAWG API key
 
   useEffect(() => {
-    axios
-      .get("http://localhost:4000/api/item/getAllItems")
-      .then((response) => setItemsData(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
+    const fetchItems = async () => {
+      try {
+        setLoading(true); // Start loading
+        const response = await axios.get(
+          "http://localhost:4000/api/item/getAllItems"
+        );
+        setItemsData(response.data);
+      } catch (error) {
+        toast.error("Error fetching data:", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
+        });
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
+
+    fetchItems();
   }, []);
 
   useEffect(() => {
@@ -41,15 +61,26 @@ const ECommerceShop = () => {
   // Fetch games from RAWG API
   const handleGameSearch = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`https://api.rawg.io/api/games`, {
         params: {
-          key: "48c8f1dcb24a41298c867ab063f3f85f",
+          key: RAWG_API_KEY,
           search: searchTerm,
         },
       });
       setSearchResults(response.data.results);
     } catch (error) {
-      console.error("Error fetching game data:", error);
+      toast.error("Error fetching game data:", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        newestOnTop: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +91,15 @@ const ECommerceShop = () => {
 
     // Ensure that price and quantity are set
     if (!price || !quantity_in_stock) {
-      toast.error("Please enter price and quantity.");
+      toast.error("Please enter price and quantity.", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        newestOnTop: true,
+      });
       return;
     }
 
@@ -72,6 +111,7 @@ const ECommerceShop = () => {
     };
 
     try {
+      setLoading(true);
       const response = await axios.post(
         "http://localhost:4000/api/item/addItem",
         gameData
@@ -80,35 +120,26 @@ const ECommerceShop = () => {
       toast.success(`${game.name} saved successfully!`, {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        newestOnTop: true,
       });
       setShowGameSearchModal(false);
     } catch (error) {
       console.error("Error saving game:", error);
-      toast.error("Error saving game.");
-    }
-  };
-
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:4000/api/item/addItem", newItemData);
-      axios
-        .get("http://localhost:4000/api/item/getAllItems")
-        .then((response) => setItemsData(response.data))
-        .catch((error) => console.error("Error fetching data:", error));
-      setShowAddItemModal(false);
-      toast.success("Item added successfully", {
+      toast.error("Error saving game.", {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        newestOnTop: true,
       });
-      setNewItemData({
-        item_name: "",
-        price: "",
-        image: "",
-        quantity_in_stock: "",
-      });
-    } catch (error) {
-      toast.error("Error adding item.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,13 +154,13 @@ const ECommerceShop = () => {
     }));
   };
 
-  const handleNewItemDataChange = (e) => {
-    const { name, value } = e.target;
-    setNewItemData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  // const handleNewItemDataChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setNewItemData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  // };
 
   const handleAddToCart = (item) => {
     setCart((prevCart) => {
@@ -147,6 +178,11 @@ const ECommerceShop = () => {
     toast.success("Item added to cart", {
       position: toast.POSITION.TOP_CENTER,
       autoClose: 1000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnFocusLoss: false,
+      draggable: true,
+      newestOnTop: true,
     });
   };
 
@@ -155,6 +191,11 @@ const ECommerceShop = () => {
     toast.info("Item removed from cart", {
       position: toast.POSITION.TOP_CENTER,
       autoClose: 1000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnFocusLoss: false,
+      draggable: true,
+      newestOnTop: true,
     });
   };
 
@@ -169,6 +210,7 @@ const ECommerceShop = () => {
   const handleMakeSale = async () => {
     for (const item of cart) {
       try {
+        setLoading(true);
         const saleData = {
           item_id: item.id,
           quantity_sold: item.quantity,
@@ -184,19 +226,36 @@ const ECommerceShop = () => {
           toast.success("Sale successful", {
             position: toast.POSITION.TOP_CENTER,
             autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            draggable: true,
+            newestOnTop: true,
           });
         } else {
           toast.error("Sale failed", {
             position: toast.POSITION.TOP_CENTER,
             autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            draggable: true,
+            newestOnTop: true,
           });
         }
       } catch (error) {
         console.error("Error making sale for item:", item, error);
         toast.error("Sale failed", {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 3000,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
         });
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -208,10 +267,13 @@ const ECommerceShop = () => {
     (total, item) => total + item.price * item.quantity,
     0
   );
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <div className="rounded-sm p-2 mt-0 lg:mt-0">
-      <div className="container font-serif">
+    <div className="rounded-sm p-2 mt-0 lg:mt-10">
+      <div className="container mx-auto font-serif px-4 lg:px-10">
         <h1 className="text-3xl font-bold mb-6 mt-5 lg:mt-4 text-center">
           Dashboard
         </h1>
@@ -231,7 +293,7 @@ const ECommerceShop = () => {
         {/* Game Search Modal */}
         {showGameSearchModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
-            <div className="bg-white p-8 rounded-lg max-w-lg w-full md:max-w-3xl lg:max-w-4xl shadow-lg mx-4 overflow-y-auto max-h-screen">
+            <div className="bg-white p-6 rounded-lg max-w-lg w-full md:max-w-3xl lg:max-w-4xl shadow-lg mx-4 overflow-y-auto max-h-screen">
               <h2 className="text-2xl font-bold mb-4">Search for Games</h2>
 
               <input
@@ -250,17 +312,14 @@ const ECommerceShop = () => {
               </button>
 
               {/* Scrollable content container for search results */}
-              <div
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 overflow-y-auto p-4"
-                style={{ maxHeight: "70vh", maxWidth: "100vw" }}
-              >
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto p-4 max-h-96">
                 {searchResults.length > 0 ? (
                   searchResults.map((game) => (
                     <div
                       key={game.id}
-                      className="rounded-lg overflow-hidden shadow-md bg-gray-100 p-4 flex flex-col"
+                      className="rounded-lg overflow-hidden shadow-md bg-gray-100 p-4 flex flex-col items-center"
                     >
-                      <h3 className="text-lg font-semibold mb-2">
+                      <h3 className="text-lg font-semibold mb-2 text-center">
                         {game.name}
                       </h3>
                       <img
@@ -269,7 +328,6 @@ const ECommerceShop = () => {
                         className="w-full h-32 md:h-48 object-cover rounded-md"
                       />
 
-                      {/* Input for price */}
                       <label className="mt-2 font-medium">Price (KES):</label>
                       <input
                         type="number"
@@ -280,7 +338,6 @@ const ECommerceShop = () => {
                         className="border rounded-md p-1 mt-1 w-full"
                       />
 
-                      {/* Input for quantity */}
                       <label className="mt-2 font-medium">Quantity:</label>
                       <input
                         type="number"
@@ -300,7 +357,7 @@ const ECommerceShop = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-center col-span-full">
+                  <p className="text-center col-span-full text-gray-700">
                     No games found. Try a different search term.
                   </p>
                 )}
@@ -316,7 +373,7 @@ const ECommerceShop = () => {
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex justify-end items-center mb-6">
           <button
             className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded relative"
             onClick={() => setShowCart(true)}
@@ -330,25 +387,25 @@ const ECommerceShop = () => {
         </div>
 
         {/* Items from database */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 p-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
           {records.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg overflow-hidden shadow-md bg-gray-100 p-6"
+              className="rounded-lg overflow-hidden shadow-md bg-gray-100 p-6 flex flex-col items-center text-center"
             >
-              <h2 className="text-4xl font-semibold mb-3">{item.item_name}</h2>
-              <p className="text-2xl font-extrabold mb-3">
+              <h2 className="text-xl font-semibold mb-3">{item.item_name}</h2>
+              <p className="text-lg font-extrabold mb-3">
                 Price: KES {item.price}
               </p>
               <img
                 src={item.image}
                 alt={item.item_name}
-                className="w-full rounded-xl h-auto mb-3"
-                style={{ width: "100%", height: "400px", objectFit: "cover" }}
+                className="w-full rounded-xl mb-3"
+                style={{ width: "100%", height: "250px", objectFit: "cover" }}
               />
               <button
                 onClick={() => handleAddToCart(item)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-auto"
               >
                 Add to Cart
               </button>
@@ -359,15 +416,20 @@ const ECommerceShop = () => {
 
       {/* Cart Modal */}
       {showCart && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80">
-          <div className="bg-white p-6 rounded-lg" style={{ width: "600px" }}>
-            <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Shopping Cart
+            </h2>
             {cart.length > 0 ? (
-              <ul>
+              <ul className="space-y-4">
                 {cart.map((item) => (
-                  <li key={item.id} className="flex justify-between mb-2">
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center"
+                  >
                     <span>
-                      {item.item_name} (KES {item.price}) x
+                      {item.item_name} (KES {item.price}) x{" "}
                       <input
                         type="number"
                         value={item.quantity}
@@ -379,7 +441,7 @@ const ECommerceShop = () => {
                       />
                     </span>
                     <button
-                      className="text-red-600"
+                      className="text-red-600 hover:text-red-800"
                       onClick={() => handleRemoveFromCart(item.id)}
                     >
                       Remove
@@ -388,12 +450,10 @@ const ECommerceShop = () => {
                 ))}
               </ul>
             ) : (
-              <p>No items in cart.</p>
+              <p className="text-center">No items in cart.</p>
             )}
-            <div className="flex justify-between mt-4">
-              <span className="font-bold text-lg">
-                Total Price: KES {totalPrice}
-              </span>
+            <div className="flex justify-between mt-4 text-lg font-semibold">
+              <span>Total Price: KES {totalPrice}</span>
               <button
                 onClick={handleMakeSale}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
@@ -404,7 +464,7 @@ const ECommerceShop = () => {
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => setShowCart(false)}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-4"
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
               >
                 Close
               </button>

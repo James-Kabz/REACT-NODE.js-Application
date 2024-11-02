@@ -13,7 +13,7 @@ const { default: rateLimit } = require("express-rate-limit");
 
 const limiter = rateLimit({
   max: 300,
-  windowMs: 60 * 60 * 1000,
+  windowMs: 10 * 10* 1000,
   message: "Too many requests from this IP, please try again in 15 minutes",
 });
 

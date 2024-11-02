@@ -1,6 +1,7 @@
 const db = require("../model/dbConnect");
 const createHttpError = require("http-errors");
-const Role = db.roles;
+const { Role, RolePermissions, Permission } = db;
+
 module.exports = {
   // Create a new role
   createRole: async (req, res, next) => {
@@ -27,7 +28,16 @@ module.exports = {
   getRoleById: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const role = await Role.findByPk(id);
+      const role = await Role.findByPk(id, {
+        include: [
+          {
+            model: Permission,
+            attributes: ["id", "permissionName"],
+            through: { attributes: [] }, // Exclude pivot table fields
+          },
+        ],
+      });
+
       if (!role) {
         throw createHttpError(404, "Role not found");
       }

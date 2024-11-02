@@ -1,6 +1,6 @@
 const db = require("../model/dbConnect");
 const users = db.users;
-const Role = db.roles;
+const { User, Role,  } = db;
 const createHttpError = require("http-errors");
 const { signAccessToken, signRefreshToken } = require("../helpers/jwtHelpers");
 const authSchema = require("../helpers/validateSchema");
@@ -12,13 +12,13 @@ module.exports = {
         req.body
       );
 
-      const exists = await users.findOne({ where: { email } });
+      const exists = await User.findOne({ where: { email } });
       if (exists) {
         throw createHttpError.Conflict(`${email} has already been registered`);
       }
 
       // Include roleId when creating a new admin
-      const newUser = new users({ roleId, email, password });
+      const newUser = new User({ roleId, email, password });
       const savedUser = await newUser.save();
 
       const accessToken = await signAccessToken(savedUser.id, roleId); // Pass roleId to token
@@ -33,7 +33,7 @@ module.exports = {
 
   getUsers: async (req, res, next) => {
     try {
-      let getAllUsers = await users.findAll({
+      let getAllUsers = await User.findAll({
         include: [
           {
             model: Role,
@@ -51,10 +51,10 @@ module.exports = {
     try {
       let id = req.params.id;
 
-      const updateUser = await users.update(req.body, {
+      const updateUser = await User.update(req.body, {
         where: { id: id },
       });
-      if (!users) {
+      if (!User) {
         throw createHttpError(404, "User not found");
       }
       res.status(200).send(updateUser);
@@ -67,7 +67,7 @@ module.exports = {
     try {
       const id = req.params.id;
 
-      const deleteUser = await users.destroy({ where: { id: id } });
+      const deleteUser = await User.destroy({ where: { id: id } });
 
       if (deleteUser === 0) {
         throw createHttpError(404, "User not found");
@@ -102,7 +102,7 @@ module.exports = {
   loginUser: async (req, res, next) => {
     try {
       const result = await authSchema.validateAsync(req.body);
-      const user = await users.findOne({ where: { email: result.email } });
+      const user = await User.findOne({ where: { email: result.email } });
 
       if (!user) throw createHttpError.NotFound("User not found");
 

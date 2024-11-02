@@ -1,6 +1,6 @@
 const db = require("../model/dbConnect");
 const createHttpError = require("http-errors");
-const items = db.items;
+const { Item } = db;
 
 module.exports = {
   addItem: async (req, res, next) => {
@@ -12,7 +12,7 @@ module.exports = {
         image: req.body.image,
       };
 
-      const addItem = await items.create(info);
+      const addItem = await Item.create(info);
       res.status(200).send(addItem);
     } catch (error) {
       next(error);
@@ -22,22 +22,22 @@ module.exports = {
   getItem: async (req, res, next) => {
     try {
       let id = req.params.id;
-      let Item = await items.findOne({
+      let item = await Item.findOne({
         where: {
           id: id,
         },
       });
-      if (!items) {
+      if (!item) {
         throw createHttpError(404, "Item not found");
       }
-      res.status(200).send(Item);
+      res.status(200).send(item);
     } catch (error) {
       next(error);
     }
   },
   getAllItems: async (req, res, next) => {
     try {
-      let getAllItems = await items.findAll();
+      let getAllItems = await Item.findAll();
       res.status(200).send(getAllItems);
     } catch (error) {
       next(error);
@@ -48,10 +48,10 @@ module.exports = {
     try {
       let id = req.params.id;
 
-      const updateItem = await items.update(req.body, {
+      const updateItem = await Item.update(req.body, {
         where: { id: id },
       });
-      if (!items) {
+      if (!Item) {
         throw createHttpError(404, "Item not found");
       }
       res.status(200).send(updateItem);
@@ -64,7 +64,7 @@ module.exports = {
     try {
       const id = req.params.id;
 
-      const deleteItem = await items.destroy({ where: { id: id } });
+      const deleteItem = await Item.destroy({ where: { id: id } });
 
       if (deleteItem === 0) {
         throw createHttpError(404, "Item not found");
