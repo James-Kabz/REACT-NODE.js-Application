@@ -1,6 +1,5 @@
 const db = require("../model/dbConnect");
-const sales = db.sales;
-const items = db.items;
+const { Sale, Item } = db;
 
 module.exports = {
   makeSale: async (req, res, next) => {
@@ -12,7 +11,7 @@ module.exports = {
         sale_date: req.body.sale_date,
       };
 
-      const item = await items.findOne({ where: { id: info.item_id } });
+      const item = await Item.findOne({ where: { id: info.item_id } });
       if (!item) {
         return res.status(404).send({ message: "Item not found" });
       }
@@ -23,11 +22,11 @@ module.exports = {
           .send({ message: "Quantity sold exceeds quantity in stock" });
       }
 
-      await items.decrement("quantity_in_stock", {
+      await Item.decrement("quantity_in_stock", {
         by: info.quantity_sold,
         where: { id: info.item_id },
       });
-      const makeSale = await sales.create(info);
+      const makeSale = await Sale.create(info);
 
       res.status(200).send(makeSale);
     } catch (error) {
@@ -37,10 +36,10 @@ module.exports = {
 
   getAllSales: async (req, res, next) => {
     try {
-      let getAllSales = await sales.findAll({
+      let getAllSales = await Sale.findAll({
         include: [
           {
-            model: items,
+            model: Item,
             attributes: ["item_name"],
           },
         ],
@@ -56,7 +55,7 @@ module.exports = {
     try {
       const id = req.params.id;
 
-      const deleteSale = await sales.destroy({ where: { id: id } });
+      const deleteSale = await Sale.destroy({ where: { id: id } });
 
       if (deleteSale === 0) {
         throw createHttpError(404, "Sale not found");

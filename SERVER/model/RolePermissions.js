@@ -31,11 +31,11 @@ module.exports = (sequelize, DataTypes) => {
 
   // Define relationships
   RolePermission.associate = (models) => {
-    RolePermission.belongsTo(models.Role, { foreignKey: "roleId", as: "role" });
-    // RolePermission model
     RolePermission.belongsTo(models.Permission, {
       foreignKey: "permissionId",
-      as: "permission",
+    });
+    RolePermission.belongsTo(models.Role, {
+      foreignKey: "roleId",
     });
   };
 

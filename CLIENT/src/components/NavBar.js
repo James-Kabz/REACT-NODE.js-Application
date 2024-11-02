@@ -1,11 +1,9 @@
-import React , {useState} from "react";
-import { useHistory } from "react-router-dom";
+import React, { useState } from "react";
+import { useHistory, Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome,
-  faPeopleArrows,
   faClipboard,
   faPowerOff,
   faBars,
@@ -13,101 +11,159 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
-  const { logout } = useAuth();
+  const { logout, userRole } = useAuth(); // Get the user role from AuthContext
   const history = useHistory();
+  const [isOpen, setIsOpen] = useState(false); // For mobile hamburger menu
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
     if (confirmLogout) {
       logout();
       sessionStorage.clear();
-      // Navigate to login page after logout
-      history.push("/Login");
+      history.push("/Login"); // Redirect to login page after logout
     }
   };
 
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggleSidebar = () => {
-      setIsOpen(!isOpen);
-    };
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
-    <div
-      className={`lg:w-60 bg-blue-950 text-white min-h-screen fixed z-50 top-0 transition-transform duration-300 ${
-        isOpen ? "w-full lg:w-60" : "w-0 lg:w-60"
-      }`}
-    >
-      <div className="p-6 space-y-12">
-        {/* Branding Section */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl lg:text-4xl font-semibold">Game Box</h1>
-          <div className="lg:hidden">
-            <button
-              onClick={toggleSidebar}
-              className="text-white focus:outline-none"
-            >
-              {isOpen ? (
-                <FontAwesomeIcon icon={faPowerOff} size="lg" />
-              ) : (
-                <FontAwesomeIcon icon={faBars} size="lg" />
-              )}
-            </button>
-          </div>
+    <div className="bg-blue-800 text-white w-full fixed top-0 z-50">
+      <div className="flex justify-between items-center p-4">
+        {/* Logo */}
+        <div className="flex items-center">
+          <h1 className="text-2xl lg:text-3xl font-semibold">
+            Aura Cosmetica Shop
+          </h1>
         </div>
 
-        {/* Navigation Links */}
-        <nav
-          className={`space-y-10 text-sm lg:text-lg font-semibold ${
-            isOpen ? "block" : "hidden lg:block"
-          }`}
-        >
+        {/* Toggle Button for Mobile */}
+        <div className="lg:hidden">
+          <button
+            onClick={toggleSidebar}
+            className="text-white focus:outline-none"
+          >
+            <FontAwesomeIcon icon={isOpen ? faPowerOff : faBars} size="lg" />
+          </button>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex space-x-12 text-lg font-semibold">
           <Link
             to="/Dashboard"
-            className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-blue-800 transition-colors"
+            className="hover:bg-blue-800 py-2 px-4 rounded transition-colors"
           >
-            <FontAwesomeIcon icon={faHome} />
-            <span>Dashboard</span>
-          </Link>
-          <Link
-            to="/AnalyticsPage"
-            className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            <FontAwesomeIcon icon={faClipboard} />
-            <span>Reports</span>
-          </Link>
-          <Link
-            to="/Data"
-            className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            <FontAwesomeIcon icon={faClipboard} />
-            <span>Sales Data</span>
-          </Link>
-          <Link
-            to="/Permissions"
-            className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            <FontAwesomeIcon icon={faPeopleArrows} />
-            <span>Permissions</span>
-          </Link>
-          <Link
-            to="/Roles"
-            className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            <FontAwesomeIcon icon={faMehRollingEyes} />
-            <span>Roles</span>
+            <FontAwesomeIcon icon={faHome} /> Home
           </Link>
 
-          <div className="mt-4 lg:mt-0">
-            <button
-              className="bg-red-600 text-white font-semibold rounded-md py-2 px-4 hover:bg-red-500 transition duration-300 ease-in-out"
-              onClick={handleLogout}
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/AnalyticsPage"
+              className="hover:bg-blue-800 py-2 px-4 rounded transition-colors"
             >
-              Log Out
-            </button>
-          </div>
+              <FontAwesomeIcon icon={faClipboard} /> Analysis & Stock
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Data"
+              className="hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+            >
+              <FontAwesomeIcon icon={faClipboard} /> Sales Data
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Permissions"
+              className="hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+            >
+              <FontAwesomeIcon icon={faMehRollingEyes} /> Manage Permissions
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Roles"
+              className="hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+            >
+              <FontAwesomeIcon icon={faMehRollingEyes} /> Manage Roles & Users
+            </Link>
+          )}
         </nav>
+
+        {/* Logout Button for Desktop */}
+        <div className="hidden lg:block">
+          <button
+            className="bg-red-600 text-white font-semibold rounded-md py-2 px-4 hover:bg-red-500 transition duration-300 ease-in-out"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Dropdown Navigation */}
+      {isOpen && (
+        <div className="lg:hidden bg-blue-800 text-lg font-semibold space-y-4 p-4">
+          <Link
+            to="/Dashboard"
+            className="block hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+            onClick={() => setIsOpen(false)} // Close menu after clicking
+          >
+            <FontAwesomeIcon icon={faHome} /> Home
+          </Link>
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/AnalyticsPage"
+              className="block hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+              onClick={() => setIsOpen(false)} // Close menu after clicking
+            >
+              <FontAwesomeIcon icon={faClipboard} /> Analysis & Stock
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Data"
+              className="block hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+              onClick={() => setIsOpen(false)} // Close menu after clicking
+            >
+              <FontAwesomeIcon icon={faClipboard} /> Sales Data
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Permissions"
+              className="block hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+              onClick={() => setIsOpen(false)} // Close menu after clicking
+            >
+              <FontAwesomeIcon icon={faMehRollingEyes} /> Manage Permissions
+            </Link>
+          )}
+
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <Link
+              to="/Roles"
+              className="block hover:bg-blue-800 py-2 px-4 rounded transition-colors"
+              onClick={() => setIsOpen(false)} // Close menu after clicking
+            >
+              <FontAwesomeIcon icon={faMehRollingEyes} /> Manage Roles & Users
+            </Link>
+          )}
+
+          <button
+            className="bg-red-600 w-full text-white font-semibold rounded-md py-2 px-4 hover:bg-red-500 transition duration-300 ease-in-out"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,17 +1,31 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
-// Function to fetch the role name from the API
-const fetchRoleName = async (roleId) => {
+// Function to fetch role and permissions data from the API
+const fetchRoleAndPermissions = async (roleId) => {
   try {
     const response = await fetch(`http://localhost:4000/api/roles/${roleId}`);
     if (!response.ok) {
-      throw new Error("Network response was not ok"); // Throw error for non-2xx responses
+      throw new Error("Network response was not ok");
     }
+
     const data = await response.json();
-    return data.roleName; // Assuming the API returns an object with a roleName property
+
+    // Extract the permission names
+    const permissions = data.permissions.map(
+      (permission) => permission.permissionName
+    );
+
+    // Log to verify the transformed permissions array
+    console.log("Fetched Role Name:", data.roleName);
+    console.log("Fetched Permissions:", permissions);
+
+    return {
+      roleName: data.roleName,
+      permissions: permissions,
+    };
   } catch (error) {
-    console.error("Failed to fetch role name:", error); // Log any fetch errors
-    throw error; // Rethrow error to handle it in the login function
+    console.error("Failed to fetch role and permissions:", error);
+    throw error;
   }
 };
 
@@ -23,62 +37,69 @@ export const AuthProvider = ({ children }) => {
     return savedLoggedIn === "true";
   });
 
-  const [userRole, setUserRole] = useState(() => {
-    return localStorage.getItem("userRole");
-  });
-
-  const [roleId, setRoleId] = useState(() => {
-    return localStorage.getItem("roleId");
+  const [userRole, setUserRole] = useState(() =>
+    localStorage.getItem("userRole")
+  );
+  const [roleId, setRoleId] = useState(() => localStorage.getItem("roleId"));
+  const [permissions, setPermissions] = useState(() => {
+    const savedPermissions = localStorage.getItem("permissions");
+    return savedPermissions ? JSON.parse(savedPermissions) : [];
   });
 
   const login = async (roleId) => {
     if (!roleId) {
-      console.error("roleId is undefined or null"); // Log error if roleId is not provided
-      return; // Early return if roleId is invalid
+      console.error("roleId is undefined or null");
+      return;
     }
 
     setIsLoggedIn(true);
-    setRoleId(roleId); // Set roleId in state
+    setRoleId(roleId);
 
     try {
-      // Fetch the role name using the roleId
-      const roleName = await fetchRoleName(roleId);
-      setUserRole(roleName); // Set the userRole from the fetched roleName
+      const { roleName, permissions } = await fetchRoleAndPermissions(roleId);
+      setUserRole(roleName);
+      setPermissions(permissions);
 
-      // Save login state, roleId, and userRole to localStorage
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("roleId", roleId); // Store roleId
-      localStorage.setItem("userRole", roleName); // Store roleName
+      localStorage.setItem("roleId", roleId);
+      localStorage.setItem("userRole", roleName);
+      localStorage.setItem("permissions", JSON.stringify(permissions));
     } catch (error) {
-      console.error("Login failed:", error); // Log any errors during login
-      // Optionally, you could also clear the login state here if desired
+      console.error("Login failed:", error);
       setIsLoggedIn(false);
       setRoleId(null);
       setUserRole(null);
+      setPermissions([]);
     }
   };
 
   const logout = () => {
     setIsLoggedIn(false);
-    setRoleId(null); // Clear roleId on logout
-    setUserRole(null); // Clear userRole
+    setRoleId(null);
+    setUserRole(null);
+    setPermissions([]);
 
     localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("roleId"); // Remove roleId from localStorage
-    localStorage.removeItem("userRole"); // Remove userRole from localStorage
+    localStorage.removeItem("roleId");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("permissions");
   };
 
   useEffect(() => {
     if (!isLoggedIn) {
       localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("roleId"); // Remove roleId if not logged in
-      localStorage.removeItem("userRole"); // Remove userRole if not logged in
+      localStorage.removeItem("roleId");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("permissions");
     }
   }, [isLoggedIn]);
 
+  const hasPermission = (permissionName) =>
+    permissions.includes(permissionName);
+
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, login, logout, userRole, roleId }}
+      value={{ isLoggedIn, login, logout, userRole, roleId, hasPermission }}
     >
       {children}
     </AuthContext.Provider>
@@ -87,10 +108,8 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const authContext = useContext(AuthContext);
-
   if (!authContext) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return authContext;
 };

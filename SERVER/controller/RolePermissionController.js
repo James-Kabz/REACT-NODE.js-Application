@@ -2,10 +2,7 @@
 const { where } = require("sequelize");
 const db = require("../model/dbConnect");
 const createHttpError = require("http-errors");
-const roles = db.roles;
-const permissions = db.permissions;
-const rolePermissions = db.rolePermissions;
-
+const { Role, Permission,RolePermission } = db;
 // Assign a permission to a role
 module.exports = {
   assignPermissionToRole: async (req, res, next) => {
@@ -13,7 +10,7 @@ module.exports = {
       const { roleId, permissionId } = req.body;
 
       // Check if the role already has the permission
-      const existingPermission = await rolePermissions.findOne({
+      const existingPermission = await RolePermission.findOne({
         where: {
           roleId: roleId,
           permissionId: permissionId,
@@ -28,7 +25,7 @@ module.exports = {
       }
 
       // If permission doesn't exist, proceed with creating it
-      const assignPermissionToRole = await rolePermissions.create({
+      const assignPermissionToRole = await RolePermission.create({
         roleId: roleId,
         permissionId: permissionId,
       });
@@ -45,15 +42,15 @@ module.exports = {
 
     try {
       let id = req.params.roleId;
-      let RolePermission = await rolePermissions.findAll({
+      let rolePermission = await RolePermission.findAll({
         where: {
           roleId: id,
         },
       });
-      if (!roles) {
+      if (!Role) {
         throw createHttpError(404, "Permissions To Role Not Found");
       }
-      res.status(201).send(RolePermission);
+      res.status(201).send(rolePermission);
     } catch (error) {
       next(error);
     }
@@ -65,7 +62,7 @@ module.exports = {
       const { roleId, permissionId } = req.body;
 
       // Find the permission entry
-      const permission = await rolePermissions.findOne({
+      const permission = await RolePermission.findOne({
         where: {
           roleId: roleId,
           permissionId: permissionId,

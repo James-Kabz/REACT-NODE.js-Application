@@ -1,6 +1,6 @@
 const createHttpError = require("http-errors");
 const db = require("../model/dbConnect");
-const Permission = db.permissions; // Ensure you import the correct model
+const { Permission } = db; // Ensure you import the correct model
 
 module.exports = {
   createPermission: async (req, res, next) => {
