@@ -14,6 +14,7 @@ import RolesPage from "./components/Roles";
 import CommerceShop from "./components/AnalyticsPage";
 import LoadingSpinner from "./components/LoadingSpinner";
 import "./Loading.css";
+import Navigation from "./components/Navigation";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +43,12 @@ function AppContent() {
   return (
     <BrowserRouter>
       <Switch>
+        <Route exact path="/">
+          <Redirect to="/Navigation" />
+        </Route>
+        <Route exact path="/Navigation">
+          <Navigation />
+        </Route>
         <Route exact path="/Login">
           <LoginForm />
         </Route>
@@ -55,7 +62,7 @@ function AppContent() {
           {isLoggedIn ? (
             <Dashboard userRole={userRole} />
           ) : (
-            <Redirect to="/Login" />
+            <Redirect to="/Navigation" />
           )}
         </Route>
       </Switch>

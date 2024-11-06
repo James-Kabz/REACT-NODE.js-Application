@@ -1,9 +1,6 @@
-import {
-  BrowserRouter as Route,
-  Switch,
-} from "react-router-dom/cjs/react-router-dom.min";
+import React from "react";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import ECommerceShop from "./Dashboard";
-import { BrowserRouter } from "react-router-dom/cjs/react-router-dom";
 import ReportsData from "./AnalyticsPage";
 import PermissionsPage from "./Permissions";
 import RolesPage from "./Roles";
@@ -15,22 +12,21 @@ const Home = () => {
       <BrowserRouter>
         <div className="">
           <Switch>
-            {/* <Route exact path="/loginUsers">
-                <LoginForm />
-              </Route> */}
+            {/* Uncomment this if you want to use the login route
+            <Route exact path="/loginUsers">
+              <LoginForm />
+            </Route>
+            */}
 
-            <Route path="/Permissions">
-              <PermissionsPage />
+            {/* Define the default root route to redirect to Dashboard */}
+            <Route exact path="/">
+              <Redirect to="/Dashboard" />
             </Route>
-            <Route path="/Roles">
-              <RolesPage />
-            </Route>
-            <Route path="/Dashboard">
-              <ECommerceShop />
-            </Route>
-            <Route path="/AnalyticsPage">
-              <ReportsData />
-            </Route>
+
+            <Route path="/Permissions" component={PermissionsPage} />
+            <Route path="/Roles" component={RolesPage} />
+            <Route path="/Dashboard" component={ECommerceShop} />
+            <Route path="/AnalyticsPage" component={ReportsData} />
           </Switch>
         </div>
       </BrowserRouter>
