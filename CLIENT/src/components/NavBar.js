@@ -20,7 +20,7 @@ const Navbar = () => {
     if (confirmLogout) {
       logout();
       sessionStorage.clear();
-      history.push("/Login"); // Redirect to login page after logout
+      history.push("/Navigation"); // Redirect to login page after logout
     }
   };
 
