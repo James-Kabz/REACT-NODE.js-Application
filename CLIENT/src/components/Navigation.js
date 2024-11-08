@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHome,
-  faClipboard,
-  faPowerOff,
   faBars,
   faSearch,
   faShoppingCart,
@@ -21,37 +18,21 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaShoppingCart } from "react-icons/fa";
+import { useCart } from "./CartContext"; // Use Cart Context for cart state
+import { FaWindowClose } from "react-icons/fa";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Navigation = () => {
-  const { logout, userRole } = useAuth();
+  const { logout, userRole, isLoggedIn } = useAuth();
+  const history = useHistory();
+  const { cart, setCart,handleQuantityChange, handleRemoveFromCart, totalPrice } =
+    useCart();
   const [isOpen, setIsOpen] = useState(false);
-  const [records, setRecords] = useState([]);
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
   const [showCart, setShowCart] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading ,setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
-          "http://localhost:4000/api/item/getAllItems"
-        );
-        setRecords(response.data);
-      } catch (error) {
-        toast.error("Error fetching data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchItems();
-  }, []);
-
-  useEffect(() => {
+    // Sync cart with localStorage
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
@@ -62,36 +43,9 @@ const Navigation = () => {
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to log out?")) {
       logout();
+      sessionStorage.clear();
+      history.push("/Shop");
     }
-  };
-
-  const handleAddToCart = (item) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prevCart, { ...item, quantity: 1 }];
-      }
-    });
-    toast.success("Item added to cart");
-  };
-
-  const handleRemoveFromCart = (id) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-    toast.info("Item removed from cart");
-  };
-
-  const handleQuantityChange = (id, newQuantity) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
   };
 
   const handleMakeSale = async () => {
@@ -104,22 +58,55 @@ const Navigation = () => {
           total_price: item.price * item.quantity,
           sale_date: new Date(),
         };
-        await axios.post("http://localhost:4000/api/sale/makeSale", saleData);
-        toast.success("Sale successful");
+        const response = await axios.post(
+          "http://localhost:4000/api/sale/makeSale",
+          saleData
+        );
+
+        if (response.status === 200) {
+          toast.success("Sale successful", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            draggable: true,
+            newestOnTop: true,
+          });
+        } else {
+          toast.error("Sale failed", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnFocusLoss: false,
+            draggable: true,
+            newestOnTop: true,
+          });
+        }
       } catch (error) {
-        toast.error("Sale failed");
+        console.error("Error making sale for item:", item, error);
+        toast.error("Sale failed", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          newestOnTop: true,
+        });
       } finally {
         setLoading(false);
       }
     }
+
     setCart([]);
     setShowCart(false);
   };
 
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="bg-black text-white w-full fixed top-0 z-50">
@@ -142,15 +129,24 @@ const Navigation = () => {
               {cart.length}
             </span>
           </button>
-          <Link to="/Login" className="hover:bg-blue-800 py-2 px-4 rounded">
-            <FontAwesomeIcon icon={faSignIn} /> Login
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="hover:bg-red-600 py-2 px-4 rounded"
+            >
+              Log Out
+            </button>
+          ) : (
+            <Link to="/Login" className="hover:bg-blue-800 py-2 px-4 rounded">
+              <FontAwesomeIcon icon={faSignIn} /> Login
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Main Navigation */}
       <div className="flex justify-between items-center p-4 bg-blue-800">
-        <div className="text-3xl font-bold">SCARTEK</div>
+        <div className="text-3xl font-bold">WeStore</div>
         <div className="flex items-center bg-white rounded-full p-2 mx-4">
           <FontAwesomeIcon icon={faSearch} className="text-gray-500 mx-2" />
           <input
@@ -160,10 +156,19 @@ const Navigation = () => {
           />
         </div>
         <nav className="hidden lg:flex space-x-8 font-semibold text-white">
+          <Link to="/Shop">Home</Link>
           <Link to="#">Gaming</Link>
           <Link to="#">TVs</Link>
           <Link to="#">Audio</Link>
           <Link to="#">Phones</Link>
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <>
+              <Link to="/AnalyticsPage">Analysis & Stock</Link>
+              <Link to="/Data">Sales Data</Link>
+              <Link to="/Permissions">Manage Permissions</Link>
+              <Link to="/Roles">Manage Roles & Users</Link>
+            </>
+          )}
         </nav>
         <button onClick={toggleSidebar} className="lg:hidden text-white">
           <FontAwesomeIcon icon={faBars} size="lg" />
@@ -173,68 +178,50 @@ const Navigation = () => {
       {/* Mobile Sidebar */}
       {isOpen && (
         <div className="lg:hidden bg-blue-800 text-white p-4 space-y-4">
-          <Link to="#" className="block">
+          <Link to="/Shop" onClick={() => setIsOpen(false)}>
+            Home
+          </Link>
+          <Link to="#" onClick={() => setIsOpen(false)}>
             Gaming
           </Link>
-          <Link to="#" className="block">
+          <Link to="#" onClick={() => setIsOpen(false)}>
             TVs
           </Link>
-          <Link to="#" className="block">
+          <Link to="#" onClick={() => setIsOpen(false)}>
             Audio
           </Link>
+          <Link to="#" onClick={() => setIsOpen(false)}>
+            Phones
+          </Link>
+          {(userRole === "admin" || userRole === "super-admin") && (
+            <>
+              <Link to="/AnalyticsPage" onClick={() => setIsOpen(false)}>
+                Analysis & Stock
+              </Link>
+              <Link to="/Data" onClick={() => setIsOpen(false)}>
+                Sales Data
+              </Link>
+              <Link to="/Permissions" onClick={() => setIsOpen(false)}>
+                Manage Permissions
+              </Link>
+              <Link to="/Roles" onClick={() => setIsOpen(false)}>
+                Manage Roles & Users
+              </Link>
+            </>
+          )}
         </div>
       )}
-      <div className="container mx-auto font-serif px-4 lg:px-10 overflow-auto max-h-screen">
-        <h1 className="text-3xl font-bold mb-6 mt-5 lg:mt-4 text-center">
-          Dashboard
-        </h1>
 
-        <div className="flex justify-end items-center mb-6">
-          <button
-            className="flex items-center bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded relative"
-            onClick={() => setShowCart(true)}
-          >
-            <FaShoppingCart className="mr-2" />
-            View Cart
-            <span className="ml-2 bg-red-600 text-white rounded-full w-6 h-6 text-center leading-6 text-sm absolute -top-2 -right-2">
-              {cart.length}
-            </span>
-          </button>
-        </div>
-
-        {/* Items from database */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-          {records.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-lg overflow-hidden shadow-md bg-white text-black p-6 flex flex-col items-center text-center"
-            >
-              <h2 className="text-xl font-semibold mb-3">{item.item_name}</h2>
-              <p className="text-lg font-extrabold mb-3">
-                Price: KES {item.price}
-              </p>
-              <img
-                src={item.image}
-                alt={item.item_name}
-                className="w-full rounded-xl mb-3"
-                style={{ width: "100%", height: "250px", objectFit: "cover" }}
-              />
-              <button
-                onClick={() => handleAddToCart(item)}
-                className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-auto"
-              >
-                Add to Cart
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Cart Modal */}
       {showCart && (
-        <div className="fixed inset-0 overflow-y-auto flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold mb-4 text-center text-black">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full mx-4 text-black">
+            <button
+              onClick={() => setShowCart(false)}
+              className="font-bold py-2 px-4 text-2xl rounded"
+            >
+              <FaWindowClose />
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-center">
               Shopping Cart
             </h2>
             {cart.length > 0 ? (
@@ -242,63 +229,46 @@ const Navigation = () => {
                 {cart.map((item) => (
                   <li
                     key={item.id}
-                    className="flex justify-between items-center text-black"
+                    className="flex justify-between items-center"
                   >
-                    <div className="flex items-center">
-                      <img
-                        src={item.image}
-                        alt={item.item_name}
-                        className="w-16 h-16 object-cover rounded mr-4"
+                    <img
+                      src={item.image}
+                      alt={item.item_name}
+                      className="w-16 h-16 object-cover rounded mr-4"
+                    />
+                    <span>
+                      {item.item_name} (KES {item.price}) x{" "}
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        min="1"
+                        onChange={(e) =>
+                          handleQuantityChange(item.id, Number(e.target.value))
+                        }
+                        className="w-16 ml-2 p-1 border rounded"
                       />
-                      <span>{item.item_name}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(item.id, item.quantity - 1)
-                        }
-                        className="bg-gray-300 text-black px-2 py-1 rounded"
-                        disabled={item.quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <span className="mx-2">{item.quantity}</span>
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(item.id, item.quantity + 1)
-                        }
-                        className="bg-gray-300 text-black px-2 py-1 rounded"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => handleRemoveFromCart(item.id)}
-                        className="ml-4 text-red-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
+                    </span>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleRemoveFromCart(item.id)}
+                    >
+                      Remove
+                    </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-center text-black">Your cart is empty.</p>
+              <p className="text-center">No items in cart.</p>
             )}
-            <div className="flex justify-between items-center mt-6">
-              <span className="font-bold text-xl">Total: KES {totalPrice}</span>
+            <div className="flex justify-between mt-4 text-lg font-semibold">
+              <span>Total Price: KES {totalPrice}</span>
               <button
                 onClick={handleMakeSale}
-                className="bg-blue-600 text-white py-2 px-4 rounded"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
               >
-                Checkout
+                Make Sale
               </button>
             </div>
-            <button
-              onClick={() => setShowCart(false)}
-              className="absolute top-2 right-2 text-xl text-black"
-            >
-              &times;
-            </button>
           </div>
         </div>
       )}
@@ -307,4 +277,3 @@ const Navigation = () => {
 };
 
 export default Navigation;
-
