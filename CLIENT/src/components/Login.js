@@ -65,7 +65,7 @@ const LoginForm = () => {
         sessionStorage.setItem("userRole", roleId);
 
         login(roleId);
-        history.replace("/Dashboard");
+        history.replace("/AnalyticsPage");
 
         toast.success("Login Successful. Welcome", {
           position: toast.POSITION.TOP_CENTER,

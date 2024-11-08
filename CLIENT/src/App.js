@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
-import Navbar from "./components/NavBar";
-import Home from "./components/Home";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import LoginForm from "./components/Login";
 import { ToastContainer } from "react-toastify";
@@ -15,7 +13,9 @@ import CommerceShop from "./components/AnalyticsPage";
 import LoadingSpinner from "./components/LoadingSpinner";
 import "./Loading.css";
 import Navigation from "./components/Navigation";
-
+import Shop from "./components/Shop";
+import { CartProvider } from "./components/CartContext";
+import "./Loading.css"
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   // const [data, setData] = useState(null);
@@ -31,23 +31,30 @@ function App() {
   }
   return (
     <AuthProvider>
-      <AppContent />
+      <CartProvider>
+        {" "}
+        {/* Wrap everything with CartProvider */}
+        <AppContent />
+      </CartProvider>{" "}
       <ToastContainer />
     </AuthProvider>
   );
 }
-
 function AppContent() {
   const { isLoggedIn, userRole } = useAuth();
 
   return (
     <BrowserRouter>
+      <Navigation /> {/* Navigation is always rendered */}
       <Switch>
         <Route exact path="/">
           <Redirect to="/Navigation" />
         </Route>
         <Route exact path="/Navigation">
           <Navigation />
+        </Route>
+        <Route exact path="/Shop">
+          <Shop /> {/* Shop route can be accessed without login */}
         </Route>
         <Route exact path="/Login">
           <LoginForm />
@@ -70,15 +77,13 @@ function AppContent() {
   );
 }
 
+
 function Dashboard({ userRole }) {
   return (
     <div>
-      <Navbar />
+      <Navigation />
       <div className="flex-grow p-10 bg-blue-gray-900">
         <Switch>
-          <Route exact path="/Dashboard">
-            <Home />
-          </Route>
           {userRole === "super-admin" && (
             <>
               <Route path="/Permissions" component={PermissionsPage} />
@@ -96,7 +101,10 @@ function Dashboard({ userRole }) {
             </>
           )}
           {userRole === "user" && <></>}
-          <Redirect to="/Dashboard" />
+          <Route exact path="/Shop">
+            <Shop />
+          </Route>
+          <Redirect to="/AnalyticsPage" />
         </Switch>
       </div>
     </div>
