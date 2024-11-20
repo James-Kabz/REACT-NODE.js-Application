@@ -1,173 +1,70 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "./AuthContext";
-
-// Modal component for adding/updating permissions
-const PermissionModal = ({ isOpen, onClose, onSave, permission }) => {
-  const [permissionName, setPermissionName] = useState("");
-  
-  useEffect(() => {
-    if (permission) {
-      setPermissionName(permission.permissionName); // Set the permission name for editing
-    } else if (isOpen) {
-      setPermissionName(""); // Reset for adding new permission
-    }
-  }, [permission, isOpen]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!permissionName) {
-      toast.error("Permission Name cannot be empty", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
-      return;
-    }
-
-    if (permission) {
-      onSave(permission.id, permissionName);
-    } else {
-      onSave(permissionName);
-    }
-
-    onClose(); // Close the modal
-  };
-
-  return (
-    <div
-      className={`fixed inset-0 bg-black bg-opacity-50 ${
-        isOpen ? "flex" : "hidden"
-      } justify-center items-center z-50`}
-    >
-      <div className="bg-white rounded-lg p-6 w-80 shadow-lg transform transition-all duration-300">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">
-          {permission ? "Edit Permission" : "Add Permission"}
-        </h3>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={permissionName}
-            onChange={(e) => setPermissionName(e.target.value)}
-            required
-            className="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Permission Name"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 w-full transition-colors duration-200"
-          >
-            {permission ? "Update" : "Add"}
-          </button>
-        </form>
-        <button onClick={onClose} className="mt-3 text-red-500 hover:underline">
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-};
+import {
+  addPermission,
+  updatePermission,
+  deletePermission,
+  getPermissions,
+} from "../FirebaseFunctions/PermissionFunction"; // Firebase functions
+import CustomModal from "./CustomModal"; // Import CustomModal
+import { showToast } from "./ToastMessage";
 
 const PermissionsPage = () => {
   const [permissions, setPermissions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state for modal actions
   const { hasPermission } = useAuth();
 
   const fetchPermissions = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/permissions");
-      setPermissions(response.data);
+      const permissionsData = await getPermissions();
+      setPermissions(permissionsData);
     } catch (error) {
-      toast.error("Failed to fetch permissions", { position: "top-center" });
+      showToast.error("Failed to fetch permissions");
     }
   };
 
-  const addPermission = async (permissionName) => {
+  const addPermissionHandler = async (permissionName) => {
+    setLoading(true);
     try {
-      await axios.post("http://localhost:4000/api/permissions", {
-        permissionName,
-      });
-      toast.success("Permission added successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      await addPermission(permissionName);
+      showToast.success("Permission added successfully!");
       fetchPermissions();
+      setModalOpen(false);
     } catch (error) {
-      toast.error("Failed to add permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      showToast.error("Failed to add permission");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const updatePermission = async (id, permissionName) => {
+  const updatePermissionHandler = async (id, permissionName) => {
+    setLoading(true);
     try {
-      await axios.put(`http://localhost:4000/api/permissions/${id}`, {
-        permissionName,
-      });
-      toast.success("Permission updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      await updatePermission(id, permissionName);
+      showToast.success("Permission updated successfully!");
       fetchPermissions();
+      setModalOpen(false);
     } catch (error) {
-      toast.error("Failed to update permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      showToast.error("Failed to update permission");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deletePermission = async (id) => {
+  const deletePermissionHandler = async (id) => {
+    setLoading(true);
     try {
-      await axios.delete(`http://localhost:4000/api/permissions/${id}`);
-      toast.success("Permission deleted successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      await deletePermission(id);
+      showToast.success("Permission deleted successfully!");
       fetchPermissions();
     } catch (error) {
-      toast.error("Failed to delete permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      showToast.error("Failed to delete permission");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -176,18 +73,18 @@ const PermissionsPage = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl max-h-5xl mx-auto mt-10 p-6 border border-gray-200 rounded-lg shadow-md bg-white space-y-4">
+    <div className="max-w-7xl max-h-5xl mx-auto mt-24 p-6 border border-gray-200 rounded-lg shadow-md bg-white space-y-4">
       <h2 className="text-3xl font-semibold text-gray-800">Permissions</h2>
       <button
         onClick={() => {
           setModalOpen(true);
-          setEditingPermission(null);
+          setEditingPermission(null); // Reset for new permission
         }}
         className="mb-6 bg-blue-600 text-white py-2 px-5 rounded hover:bg-blue-700 transition-all duration-200"
       >
         Add Permission
       </button>
-      <ul className="divide-y divide-gray-200">
+      <ul className=" divide-y divide-gray-200">
         {permissions.map((permission) => (
           <li
             key={permission.id}
@@ -208,7 +105,7 @@ const PermissionsPage = () => {
               )}
               {hasPermission("delete_permission") && (
                 <button
-                  onClick={() => deletePermission(permission.id)}
+                  onClick={() => deletePermissionHandler(permission.id)}
                   className="text-red-600 hover:underline"
                 >
                   Delete
@@ -219,12 +116,45 @@ const PermissionsPage = () => {
         ))}
       </ul>
 
-      <PermissionModal
+      <CustomModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSave={editingPermission ? updatePermission : addPermission}
-        permission={editingPermission}
-      />
+        title={editingPermission ? "Edit Permission" : "Add Permission"}
+        loading={loading}
+        footerButtons={[
+          {
+            label: editingPermission ? "Update" : "Add",
+            onClick: () => {
+              const permissionName =
+                document.getElementById("permission-name").value;
+              if (editingPermission) {
+                updatePermissionHandler(editingPermission.id, permissionName);
+              } else {
+                addPermissionHandler(permissionName);
+              }
+            },
+            isLoading: loading,
+            className:
+              "bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700",
+          },
+          {
+            label: "Cancel",
+            onClick: () => setModalOpen(false),
+            className:
+              "bg-gray-300 text-black py-2 px-4 rounded hover:bg-gray-400",
+          },
+        ]}
+      >
+        <input
+          id="permission-name"
+          type="text"
+          defaultValue={
+            editingPermission ? editingPermission.permissionName : ""
+          }
+          className="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Permission Name"
+        />
+      </CustomModal>
 
       {/* Toast Notifications */}
       <ToastContainer position="top-center" autoClose={1000} />

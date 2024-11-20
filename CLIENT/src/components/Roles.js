@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useAuth } from "./AuthContext";
 import AddUserModal from "../auth/AddUserModal";
 import {
@@ -37,7 +37,7 @@ const RolesPage = () => {
       const roles = await getRoles();
       setRoles(roles);
     } catch (error) {
-      toast.error("Failed to fetch roles");
+      showToast.error("Failed to fetch roles");
     }
   };
 
@@ -48,15 +48,7 @@ const RolesPage = () => {
       );
       setUsers(response.data);
     } catch (error) {
-      toast.error("Failed to fetch users", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      showToast.error("Failed to fetch users");
     }
   };
 
@@ -76,7 +68,7 @@ const RolesPage = () => {
       }
       resetForm();
     } catch (error) {
-      toast.error(error.message || "An error occurred.");
+      showToast.error(error.message || "An error occurred.");
     } finally {
       setLoading(false);
     }
