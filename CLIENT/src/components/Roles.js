@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import Modal from "react-modal";
-import { FaSpinner } from "react-icons/fa";
 import { useAuth } from "./AuthContext";
+import AddUserModal from "../auth/AddUserModal";
 
 const RolesPage = () => {
   const [roles, setRoles] = useState([]);
@@ -26,10 +26,9 @@ const RolesPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [roleId, setRoleId] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, ] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null); // Track user to delete
   const [userToEdit, setUserToEdit] = useState(null);
-  const [loading, setLoading] = useState(false); // Set loading to false initially
   const { hasPermission } = useAuth();
 
   useEffect(() => {
@@ -322,48 +321,8 @@ const RolesPage = () => {
     );
   };
 
-  // Handle adding a new user
-  const handleAddUser = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await axios.post("http://localhost:4000/api/user/addUser", {
-        email,
-        password,
-        roleId,
-      });
-      toast.success("User added successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
-      fetchUsers();
-      closeAddUserModal();
-    } catch (error) {
-      toast.error("Failed to add user", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const openAddUserModal = () => {
+    // route for add user modal
     setIsAddUserModalOpen(true);
   };
 
@@ -483,6 +442,15 @@ const RolesPage = () => {
         >
           Add User
         </button>
+      )}
+
+      {isAddUserModalOpen && (
+        <AddUserModal
+          isAddUserModalOpen={isAddUserModalOpen}
+          closeAddUserModal={closeAddUserModal}
+          roles={roles}
+          fetchUsers={fetchUsers}
+        />
       )}
 
       {hasPermission("add_role") && (
@@ -611,82 +579,7 @@ const RolesPage = () => {
         ))}
       </ul>
 
-      {/* Add User Modal */}
-      <Modal
-        isOpen={isAddUserModalOpen}
-        onRequestClose={closeAddUserModal}
-        contentLabel="Add User"
-        className="max-w-md mx-auto mt-24 p-5 border border-gray-300 rounded-lg bg-white"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      >
-        <h3 className="text-lg font-bold mb-4">Add New User</h3>
-        <form onSubmit={handleAddUser}>
-          <label className="block text-gray-700">
-            Email:
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border border-gray-300 rounded p-2 mt-1 w-full"
-            />
-          </label>
-          <label className="block text-gray-700 mt-3">
-            Role:
-            <select
-              value={roleId}
-              onChange={(e) => setRoleId(e.target.value)}
-              required
-              className="border border-gray-300 rounded p-2 mt-1 w-full"
-            >
-              <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.roleName}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-gray-700 mt-3 relative">
-            Password:
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border border-gray-300 rounded p-2 mt-1 w-full"
-            />
-            <button
-              type="button"
-              className="absolute right-2 top-3 text-gray-600"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </label>
-          <label className="block text-gray-700 mt-3">
-            Confirm Password:
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="border border-gray-300 rounded p-2 mt-1 w-full"
-            />
-          </label>
-          <button
-            type="submit"
-            className="mt-4 w-full flex items-center justify-center bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition duration-200"
-          >
-            {loading ? (
-              <FaSpinner className="animate-spin mr-2" /> // Loading spinner icon
-            ) : (
-              "Add User"
-            )}{" "}
-          </button>
-        </form>
-      </Modal>
-
+    
       {/* Delete User Modal */}
       <Modal
         isOpen={isDeleteUserModalOpen}

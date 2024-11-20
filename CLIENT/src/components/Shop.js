@@ -57,7 +57,6 @@ const Shop = () => {
           </div>
         ))}
       </div>
-      <div>Total Price: {totalPrice}</div>
     </div>
   );
 };

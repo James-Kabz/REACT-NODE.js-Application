@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/AuthContext";
-import LoginForm from "./components/Login";
+import LoginForm from "./auth/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DataPage from "./components/Data";
@@ -16,6 +16,7 @@ import Navigation from "./components/Navigation";
 import Shop from "./components/Shop";
 import { CartProvider } from "./components/CartContext";
 import "./Loading.css"
+import AddUserModal from "./auth/AddUserModal";
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   // const [data, setData] = useState(null);
@@ -88,6 +89,7 @@ function Dashboard({ userRole }) {
             <>
               <Route path="/Permissions" component={PermissionsPage} />
               <Route path="/Roles" component={RolesPage} />
+              <Route path="/auth/RegisterForm" component={AddUserModal} />
               <Route path="/AnalyticsPage" component={CommerceShop} />
               <Route path="/Data" component={DataPage} />
             </>
