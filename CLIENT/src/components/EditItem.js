@@ -52,7 +52,7 @@ const EditItem = ({ item, onClose, onUpdate }) => {
   
   <label className="block mb-4 text-xl lg:text-3xl font-bold">Price:</label>
   <input
-    type="number"
+    type="text"
     className="w-full mb-6 p-2 lg:p-5 bg-gray-200 rounded-md"
     value={price}
     onChange={(e) => setPrice(e.target.value)}
