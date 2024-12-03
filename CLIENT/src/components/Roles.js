@@ -12,6 +12,8 @@ import {
 import CustomModal from "./CustomModal";
 import { showToast } from "./ToastMessage";
 import { FaSpinner } from "react-icons/fa";
+import { getPermissions } from "../FirebaseFunctions/PermissionFunction";
+import { assignPermissionsToRole, getPermissionsForRole, updatePermissionsForRole } from "../FirebaseFunctions/RolePermissions";
 
 const RolesPage = () => {
   const [roles, setRoles] = useState([]);
@@ -20,6 +22,13 @@ const RolesPage = () => {
   const [editId, setEditId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
+
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
+  const [permissions, setPermissions] = useState([]);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
+
+
 
   const [users, setUsers] = useState([]);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -30,6 +39,7 @@ const RolesPage = () => {
   useEffect(() => {
     fetchRoles();
     fetchUsers();
+    fetchPermissions();
   }, []);
 
   const fetchRoles = async () => {
@@ -49,6 +59,16 @@ const RolesPage = () => {
       setUsers(response.data);
     } catch (error) {
       showToast.error("Failed to fetch users");
+    }
+  };
+
+  const fetchPermissions = async () => {
+    try {
+      const fetchedPermissions = await getPermissions();
+      setPermissions(fetchedPermissions);
+    } catch (error) {
+      showToast.error("Failed to fetch permissions");
+      setPermissions([])
     }
   };
 
@@ -88,6 +108,86 @@ const RolesPage = () => {
     }
   };
 
+
+  // permissions to role
+const handleAssignOrUpdatePermissions = async () => {
+  if (!selectedRoleId) return;
+
+  try {
+    const existingPermissions = await fetchPermissionsForRole(selectedRoleId);
+
+    if (existingPermissions.length === 0) {
+      // Assign permissions if no permissions are currently assigned
+      await assignPermissionsToRole(selectedRoleId, selectedPermissions);
+      showToast.success("Permissions assigned successfully!");
+    } else {
+      // Update permissions if there are existing permissions
+      await updatePermissionsForRole(selectedRoleId, selectedPermissions);
+      showToast.success("Permissions updated successfully!");
+    }
+
+    closePermissionModal();
+  } catch (error) {
+    showToast.error(error.message || "Failed to assign or update permissions.");
+  }
+};
+
+
+// const handleUpdatePermissions = async () => {
+//   if (!selectedRoleId) return;
+//   try {
+//     await updatePermissionsForRole(selectedRoleId, selectedPermissions);
+//     showToast.success("Permissions updated successfully!");
+//     closePermissionModal();
+//   } catch (error) {
+//     showToast.error("Failed to update permissions.");
+//   }
+// };
+
+const fetchPermissionsForRole = async (roleId) => {
+  try {
+    const permissions = await getPermissionsForRole(roleId);
+    if (!permissions || !Array.isArray(permissions)) {
+      setSelectedPermissions([]); // Fallback to empty array if no permissions found
+      showToast.info("No permissions assigned to this role yet.");
+      return;
+    }
+    setSelectedPermissions(permissions.map((perm) => perm.id)); // Map permissions to IDs
+  } catch (error) {
+    console.error("Failed to fetch permissions for role:", error.message);
+    showToast.error("Failed to fetch permissions for this role.");
+  }
+};
+
+
+
+const openPermissionModal = async (roleId) => {
+  try {
+    setSelectedRoleId(roleId);
+    const rolePermissions = await getPermissionsForRole(roleId);
+
+    if (!rolePermissions || !Array.isArray(rolePermissions)) {
+      setSelectedPermissions([]); // No permissions assigned
+      showToast.info("No permissions assigned to this role yet.");
+    } else {
+      setSelectedPermissions(rolePermissions.map((perm) => perm.id)); // Assuming permission IDs are returned
+    }
+
+    setIsPermissionModalOpen(true);
+  } catch (error) {
+    console.error("Error fetching permissions for role:", error.message);
+    showToast.error("Failed to fetch role permissions.");
+  }
+};
+
+
+
+
+  const closePermissionModal = () => {
+    setIsPermissionModalOpen(false);
+    // setCurrentRoleId(null);
+    // setSelectedPermissions([]);
+  };
   const openDeleteModal = (role) => {
     setRoleToDelete(role); // Set the role to delete
     setIsDeleteModalOpen(true); // Open the modal
@@ -202,6 +302,13 @@ const RolesPage = () => {
                   Delete
                 </button>
               )}
+
+              <button
+                onClick={() => openPermissionModal(role.id)}
+                className="bg-blue-500 text-white rounded px-2 py-1 hover:bg-blue-600 transition duration-200"
+              >
+                Manage Permissions
+              </button>
             </div>
           </li>
         ))}
@@ -221,6 +328,47 @@ const RolesPage = () => {
           </li>
         ))}
       </ul>
+
+      <CustomModal
+        isOpen={isPermissionModalOpen}
+        onClose={closePermissionModal}
+        title="Manage Permissions"
+        footerButtons={[
+          {
+            label: "Cancel",
+            onClick: closePermissionModal,
+            className:
+              "bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-600",
+          },
+          {
+            label: "Save Permissions",
+            onClick: handleAssignOrUpdatePermissions,
+            className:
+              "bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600",
+          },
+        ]}
+      >
+        {permissions && permissions.length > 0 ? (
+          permissions.map((permission) => (
+            <div key={permission.id} className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                checked={selectedPermissions.includes(permission.id)}
+                onChange={(e) => {
+                  const updatedPermissions = e.target.checked
+                    ? [...selectedPermissions, permission.id]
+                    : selectedPermissions.filter((id) => id !== permission.id);
+                  setSelectedPermissions(updatedPermissions);
+                }}
+                className="mr-2"
+              />
+              <span>{permission.permissionName}</span>
+            </div>
+          ))
+        ) : (
+          <p>No permissions available to assign</p>
+        )}
+      </CustomModal>
 
       {/* Delete Confirmation Modal */}
       <CustomModal

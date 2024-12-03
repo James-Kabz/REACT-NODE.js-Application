@@ -47,11 +47,15 @@ export const deletePermission = async (permissionId) => {
 
 // get roles
 export const getPermissions = async () => {
-  const permissionsRef = collection(db, "permissions");
-  const permissionsSnapshot = await getDocs(permissionsRef);
-  const permissions = permissionsSnapshot.docs.map((doc) => ({
-    id: doc.id, // Include the document ID
-    ...doc.data(), // Spread the other data
-  }));
-  return permissions;
+  try {
+    const permissions = [];
+    const querySnapshot = await getDocs(collection(db, "permissions"));
+    querySnapshot.forEach((doc) => {
+      permissions.push({ id: doc.id, ...doc.data() });
+    });
+    return permissions;
+  } catch (error) {
+    console.error("Failed to fetch permissions:", error);
+    return [];
+  }
 };
