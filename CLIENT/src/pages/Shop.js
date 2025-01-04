@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useCart } from "./CartContext";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useCart } from "../context/CartContext";
 
 const Shop = () => {
-  const [ records, setRecords ] = useState([]);
-  const [ loading, setLoading ] = useState(true);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { handleAddToCart, totalPrice } = useCart();
 
   useEffect(() => {

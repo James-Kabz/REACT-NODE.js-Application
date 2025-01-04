@@ -1,8 +1,9 @@
 // ForgotPasswordForm.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer,  } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { CustomToast } from '../components/CustomToast';
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
@@ -16,36 +17,12 @@ const ForgotPasswordForm = () => {
     try {
       const response = await axios.post('http://localhost:4000/api/user/forgotPassword', { email });
       if (response.status === 200) {
-        toast.success("Password reset link sent to your email", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.success("Password reset link sent to your email");
       } else {
-        toast.error("Failed to send reset link", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.error("Failed to send reset link");
       }
     } catch (error) {
-      toast.error("Error sending reset link", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Error sending reset link");
     }
   };
 

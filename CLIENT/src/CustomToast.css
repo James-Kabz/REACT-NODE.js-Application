@@ -1,0 +1,26 @@
+.Toastify__toast {
+  border-radius: 8px;
+  font-family: "Arial", sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, white, white);
+  /* color: white; */
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #f44336, #e57373);
+  color: white;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #2196f3, #64b5f6);
+  color: white;
+}
+
+.Toastify__toast--warn {
+  background: linear-gradient(135deg, #ff9800, #ffb74d);
+  color: white;
+}

@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { AuthContext } from "./AuthContext";
-import { ToastContainer, toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
+import { CustomToast } from "../components/CustomToast";
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false); // Set loading to false initially
@@ -30,19 +31,11 @@ const LoginForm = () => {
 
     try {
       if (!data.email || !data.email.includes("@")) {
-        toast.error("Enter a valid email", { autoClose: 3000 });
+        CustomToast.error("Enter a valid email");
         return;
       }
       if (data.password.length < 8) {
-        toast.error("Password must be at least 8 characters", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.error("Please enter a valid password");
         return;
       }
 
@@ -67,52 +60,20 @@ const LoginForm = () => {
         login(roleId);
         history.replace("/AnalyticsPage");
 
-        toast.success("Login Successful. Welcome", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.success("Login Successful. Welcome");
       } else if (response.status === 401) {
         const newAccessToken = await refreshToken();
 
         if (newAccessToken) {
           await handleLogin(e);
         } else {
-          toast.error("Invalid username/password", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnFocusLoss: false,
-            draggable: true,
-            newestOnTop: true,
-          });
+          CustomToast.error("Invalid username/password");
         }
       } else {
-        toast.error("Authentication Failed", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.error("Authentication Failed");
       }
     } catch (error) {
-      toast.error("Invalid username/password", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Invalid username/password");
     } finally {
       setLoading(false); // Stop loading after all processes are completed
     }

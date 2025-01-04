@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer,  } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../context/AuthContext";
+import { CustomToast } from "../components/CustomToast";
 
 // Modal component for adding/updating permissions
 const PermissionModal = ({ isOpen, onClose, onSave, permission }) => {
   const [permissionName, setPermissionName] = useState("");
-  
+
   useEffect(() => {
     if (permission) {
       setPermissionName(permission.permissionName); // Set the permission name for editing
@@ -19,15 +20,7 @@ const PermissionModal = ({ isOpen, onClose, onSave, permission }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!permissionName) {
-      toast.error("Permission Name cannot be empty", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Permission Name cannot be empty",);
       return;
     }
 
@@ -85,7 +78,7 @@ const PermissionsPage = () => {
       const response = await axios.get("http://localhost:4000/api/permissions");
       setPermissions(response.data);
     } catch (error) {
-      toast.error("Failed to fetch permissions", { position: "top-center" });
+      CustomToast.error("Failed to fetch permissions", );
     }
   };
 
@@ -94,26 +87,10 @@ const PermissionsPage = () => {
       await axios.post("http://localhost:4000/api/permissions", {
         permissionName,
       });
-      toast.success("Permission added successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("Permission added successfully!");
       fetchPermissions();
     } catch (error) {
-      toast.error("Failed to add permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to add permission");
     }
   };
 
@@ -122,52 +99,20 @@ const PermissionsPage = () => {
       await axios.put(`http://localhost:4000/api/permissions/${id}`, {
         permissionName,
       });
-      toast.success("Permission updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("Permission updated successfully!");
       fetchPermissions();
     } catch (error) {
-      toast.error("Failed to update permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to update permission");
     }
   };
 
   const deletePermission = async (id) => {
     try {
       await axios.delete(`http://localhost:4000/api/permissions/${id}`);
-      toast.success("Permission deleted successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("Permission deleted successfully!");
       fetchPermissions();
     } catch (error) {
-      toast.error("Failed to delete permission", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to delete permission");
     }
   };
 

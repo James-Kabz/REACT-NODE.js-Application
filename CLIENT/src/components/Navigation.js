@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useAuth } from "./AuthContext";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,11 +15,12 @@ import {
   faWhatsapp,
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCart } from "./CartContext"; // Use Cart Context for cart state
 import { FaWindowClose } from "react-icons/fa";
 import LoadingSpinner from "./LoadingSpinner";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { CustomToast } from "./CustomToast";
 
 const Navigation = () => {
   const { logout, userRole, isLoggedIn } = useAuth();
@@ -64,37 +64,13 @@ const Navigation = () => {
         );
 
         if (response.status === 200) {
-          toast.success("Sale successful", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnFocusLoss: false,
-            draggable: true,
-            newestOnTop: true,
-          });
+          CustomToast.success("Item bought successfully");
         } else {
-          toast.error("Sale failed", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnFocusLoss: false,
-            draggable: true,
-            newestOnTop: true,
-          });
+          CustomToast.error("Sale failed");
         }
       } catch (error) {
         console.error("Error making sale for item:", item, error);
-        toast.error("Sale failed", {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.error("Sale failed");
       } finally {
         setLoading(false);
       }

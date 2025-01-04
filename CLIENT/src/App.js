@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
-import { AuthProvider, useAuth } from "./components/AuthContext";
-import LoginForm from "./components/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import LoginForm from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DataPage from "./components/Data";
-import ForgotPasswordForm from "./components/ForgotPassword";
-import ResetPasswordForm from "./components/ResetPassword";
-import PermissionsPage from "./components/Permissions";
-import RolesPage from "./components/Roles";
-import CommerceShop from "./components/AnalyticsPage";
+import DataPage from "./pages/Data";
+import ForgotPasswordForm from "./pages/ForgotPassword";
+import ResetPasswordForm from "./pages/ResetPassword";
+import PermissionsPage from "./pages/Permissions";
+import RolesPage from "./pages/Roles";
+import CommerceShop from "./pages/AnalyticsPage";
 import LoadingSpinner from "./components/LoadingSpinner";
 import "./Loading.css";
 import Navigation from "./components/Navigation";
-import Shop from "./components/Shop";
-import { CartProvider } from "./components/CartContext";
+import Shop from "./pages/Shop";
+import { CartProvider } from "./context/CartContext";
 import "./Loading.css"
 function App() {
   const [isLoading, setIsLoading] = useState(true);

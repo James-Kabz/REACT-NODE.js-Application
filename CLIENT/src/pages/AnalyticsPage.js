@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import EditItem from "./EditItem";
-import DeleteItem from "./DeleteItem";
+import EditItem from "../components/EditItem";
+import DeleteItem from "../components/DeleteItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import LoadingSpinner from "./LoadingSpinner";
-import { useAuth } from "./AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../context/AuthContext";
+import { CustomToast } from "../components/CustomToast";
 
 function CommerceShop() {
   const [records, setItemsData] = useState([]);
@@ -33,15 +34,7 @@ function CommerceShop() {
       setItemsData(response.data);
       calculateTotalValue(response.data);
     } catch (error) {
-      toast.error("Error fetching data:", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Error fetching data:");
     } finally {
       setLoading(false);
     }
@@ -62,15 +55,7 @@ function CommerceShop() {
       });
       setSearchResults(response.data.results);
     } catch (error) {
-      toast.error("Error fetching game data:", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Error fetching game data:");
     } finally {
       setLoading(false);
     }
@@ -82,15 +67,7 @@ function CommerceShop() {
 
     // Ensure that price and quantity are set
     if (!price || !quantity_in_stock) {
-      toast.error("Please enter price and quantity.", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Please enter price and quantity.");
       return;
     }
 
@@ -108,27 +85,11 @@ function CommerceShop() {
         gameData
       );
       setItemsData((prevItems) => [...prevItems, response.data]);
-      toast.success(`${game.name} saved successfully!`, {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success(`${game.name} saved successfully!`);
       setShowGameSearchModal(false);
     } catch (error) {
       console.error("Error saving game:", error);
-      toast.error("Error saving game.", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Error saving game.");
     } finally {
       setLoading(false);
     }
@@ -154,28 +115,12 @@ function CommerceShop() {
 
   const handleUpdateItem = async () => {
     await fetchItemsData();
-    toast.success(`Updated successfully`, {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: 1000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnFocusLoss: false,
-      draggable: true,
-      newestOnTop: true,
-    });
+    CustomToast.success(`Updated successfully`);
   };
 
   const handleDelete = async () => {
     await fetchItemsData();
-    toast.success(`Deleted successfully`, {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: 1000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnFocusLoss: false,
-      draggable: true,
-      newestOnTop: true,
-    });
+    CustomToast.success(`Deleted successfully`);
   };
 
   const handleCloseUpdateModal = () => {

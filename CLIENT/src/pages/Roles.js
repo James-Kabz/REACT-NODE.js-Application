@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Modal from "react-modal";
 import { FaSpinner } from "react-icons/fa";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../context/AuthContext";
+import { CustomToast } from "../components/CustomToast";
 
 const RolesPage = () => {
   const [roles, setRoles] = useState([]);
@@ -43,7 +44,7 @@ const RolesPage = () => {
       const response = await axios.get("http://localhost:4000/api/roles");
       setRoles(response.data);
     } catch (error) {
-      toast.error("Failed to fetch roles");
+      CustomToast.error("Failed to fetch roles");
     }
   };
 
@@ -52,7 +53,7 @@ const RolesPage = () => {
       const response = await axios.get("http://localhost:4000/api/permissions");
       setPermissions(response.data);
     } catch (error) {
-      toast.error("Failed to fetch permissions");
+      CustomToast.error("Failed to fetch permissions");
     }
   };
   const fetchUsers = async () => {
@@ -62,15 +63,7 @@ const RolesPage = () => {
       );
       setUsers(response.data);
     } catch (error) {
-      toast.error("Failed to fetch users", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to fetch users");
     }
   };
 
@@ -89,21 +82,10 @@ const RolesPage = () => {
         roleName: roleName,
       });
       setRoles([...roles, response.data]);
-      toast.success("Role added successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-      });
+      CustomToast.success("Role added successfully!");
       resetForm();
     } catch (error) {
-      toast.error("Failed to add role", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to add role");
     }
   };
 
@@ -116,26 +98,10 @@ const RolesPage = () => {
         r.id === id ? { ...r, roleName: roleName } : r
       );
       setRoles(updatedRoles);
-      toast.success("Role updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("Role updated successfully!");
       resetForm();
     } catch (error) {
-      toast.error("Failed to update role", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to update role");
     }
   };
 
@@ -154,26 +120,10 @@ const RolesPage = () => {
     try {
       await axios.delete(`http://localhost:4000/api/roles/${id}`);
       setRoles(roles.filter((role) => role.id !== id));
-      toast.success("Role deleted successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("Role deleted successfully!");
       closeDeleteModal();
     } catch (error) {
-      toast.error("Failed to delete role", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to delete role");
     }
   };
 
@@ -206,15 +156,7 @@ const RolesPage = () => {
       // Extract permission IDs from the response
       setSelectedPermissions(response.data.map((p) => p.permissionId)); // Adjust according to API response
     } catch (error) {
-      toast.error("Failed to fetch permissions for the role", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to fetch permissions for the role");
     }
   };
 
@@ -269,42 +211,18 @@ const RolesPage = () => {
 
       // Display appropriate toast messages based on results
       if (successCount > 0) {
-        toast.success(`permissions updated successfully!`, {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.success(`permissions updated successfully!`);
       }
       // if (skipCount > 0) {
       //   toast.info(`${skipCount} permissions were already assigned.`);
       // }
       if (removedCount > 0) {
-        toast.success(`permissions removed from the role.`, {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          draggable: true,
-          newestOnTop: true,
-        });
+        CustomToast.success(`permissions removed from the role.`);
       }
 
       closePermissionModal();
     } catch (error) {
-      toast.error("Failed to update permissions for the role", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to update permissions for the role");
     }
   };
 
@@ -326,7 +244,7 @@ const RolesPage = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      CustomToast.error("Passwords do not match");
       return;
     }
 
@@ -337,27 +255,11 @@ const RolesPage = () => {
         password,
         roleId,
       });
-      toast.success("User added successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("User added successfully!");
       fetchUsers();
       closeAddUserModal();
     } catch (error) {
-      toast.error("Failed to add user", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to add user");
     } finally {
       setLoading(false);
     }
@@ -385,26 +287,10 @@ const RolesPage = () => {
     try {
       await axios.delete(`http://localhost:4000/api/user/deleteUser/${id}`);
       setUsers(users.filter((user) => user.id !== id));
-      toast.success("User deleted successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("User deleted successfully!");
       closeDeleteUserModal();
     } catch (error) {
-      toast.error("Failed to delete user", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to delete user");
     }
   };
 
@@ -424,7 +310,7 @@ const RolesPage = () => {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     if (password && password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      CustomToast.error("Passwords do not match");
       return;
     }
 
@@ -437,27 +323,11 @@ const RolesPage = () => {
           roleId,
         }
       );
-      toast.success("User updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.success("User updated successfully!");
       fetchUsers();
       closeEditUserModal();
     } catch (error) {
-      toast.error("Failed to update user", {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnFocusLoss: false,
-        draggable: true,
-        newestOnTop: true,
-      });
+      CustomToast.error("Failed to update user");
     }
   };
 

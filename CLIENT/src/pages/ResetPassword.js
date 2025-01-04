@@ -1,9 +1,10 @@
 // ResetPasswordForm.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams, useHistory } from 'react-router-dom';
+import { CustomToast } from '../components/CustomToast';
 
 const ResetPasswordForm = () => {
   const { token } = useParams();
@@ -23,31 +24,19 @@ const ResetPasswordForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (data.password !== data.confirmPassword) {
-      toast.error('Passwords do not match', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 3000
-      });
+      CustomToast.error("Passwords do not match");
       return;
     }
     try {
       const response = await axios.post(`http://localhost:4000/api/user/resetPassword/${token}`, { password: data.password });
       if (response.status === 200) {
-        toast.success('Password reset successfully', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000,
-        });
+        CustomToast.success("Password reset successfully");
         history.replace('/loginUser');
       } else {
-        toast.error('Password reset failed', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000,
-        });
+        CustomToast.error("Password reset failed");
       }
     } catch (error) {
-      toast.error('Error resetting password', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 3000,
-      });
+      CustomToast.error("Error resetting password");
     }
   };
 

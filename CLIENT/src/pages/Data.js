@@ -3,8 +3,8 @@ import { useLocation, useHistory } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for Toast
-import LoadingSpinner from "./LoadingSpinner";
-import { useAuth } from "./AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../context/AuthContext";
 
 const DataPage = () => {
   const [sales, setSales] = useState([]);
@@ -15,7 +15,7 @@ const DataPage = () => {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const { hasPermission } = useAuth();
-  
+
   const handleSearch = (e) => {
     setLoading(true);
     e.preventDefault();
