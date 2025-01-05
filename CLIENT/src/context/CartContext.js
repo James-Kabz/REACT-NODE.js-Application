@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { toast } from "react-toastify";
+import { CustomToast } from "../components/CustomToast";
 
 const CartContext = createContext();
 
@@ -28,28 +28,12 @@ export const CartProvider = ({ children }) => {
         return [...prevCart, { ...item, quantity: 1 }];
       }
     });
-    toast.success("Item added to cart", {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: 1000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnFocusLoss: false,
-      draggable: true,
-      newestOnTop: true,
-    });
+    CustomToast.success("Item added to cart");
   };
 
   const handleRemoveFromCart = (id) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-    toast.info("Item removed from cart", {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: 1000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnFocusLoss: false,
-      draggable: true,
-      newestOnTop: true,
-    });  };
+    CustomToast.info("Item removed from cart");  };
 
   const handleQuantityChange = (id, quantity) => {
     setCart((prevCart) =>
