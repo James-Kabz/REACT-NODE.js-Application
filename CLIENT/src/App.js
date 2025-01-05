@@ -48,7 +48,7 @@ function AppContent() {
       <Navigation /> {/* Navigation is always rendered */}
       <Switch>
         <Route exact path="/">
-          <Redirect to="/Navigation" />
+          <Redirect to="/Shop" />
         </Route>
         <Route exact path="/Navigation">
           <Navigation />

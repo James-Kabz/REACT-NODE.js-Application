@@ -25,11 +25,16 @@ import { CustomToast } from "./CustomToast";
 const Navigation = () => {
   const { logout, userRole, isLoggedIn } = useAuth();
   const history = useHistory();
-  const { cart, setCart,handleQuantityChange, handleRemoveFromCart, totalPrice } =
-    useCart();
+  const {
+    cart,
+    setCart,
+    handleQuantityChange,
+    handleRemoveFromCart,
+    totalPrice,
+  } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
-  const [loading ,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Sync cart with localStorage
@@ -132,11 +137,15 @@ const Navigation = () => {
           />
         </div>
         <nav className="hidden lg:flex space-x-8 font-semibold text-white">
-          <Link to="/Shop">Home</Link>
-          <Link to="#">Gaming</Link>
-          <Link to="#">TVs</Link>
-          <Link to="#">Audio</Link>
-          <Link to="#">Phones</Link>
+          {userRole !== "admin" && userRole !== "super-admin" && (
+            <>
+              <Link to="/Shop">Home</Link>
+              <Link to="#">Gaming</Link>
+              <Link to="#">TVs</Link>
+              <Link to="#">Audio</Link>
+              <Link to="#">Phones</Link>
+            </>
+          )}
           {(userRole === "admin" || userRole === "super-admin") && (
             <>
               <Link to="/AnalyticsPage">Analysis & Stock</Link>
@@ -151,40 +160,90 @@ const Navigation = () => {
         </button>
       </div>
 
-      {/* Mobile Sidebar */}
       {isOpen && (
-        <div className="lg:hidden bg-blue-800 text-white p-4 space-y-4">
-          <Link to="/Shop" onClick={() => setIsOpen(false)}>
-            Home
-          </Link>
-          <Link to="#" onClick={() => setIsOpen(false)}>
-            Gaming
-          </Link>
-          <Link to="#" onClick={() => setIsOpen(false)}>
-            TVs
-          </Link>
-          <Link to="#" onClick={() => setIsOpen(false)}>
-            Audio
-          </Link>
-          <Link to="#" onClick={() => setIsOpen(false)}>
-            Phones
-          </Link>
-          {(userRole === "admin" || userRole === "super-admin") && (
-            <>
-              <Link to="/AnalyticsPage" onClick={() => setIsOpen(false)}>
-                Analysis & Stock
-              </Link>
-              <Link to="/Data" onClick={() => setIsOpen(false)}>
-                Sales Data
-              </Link>
-              <Link to="/Permissions" onClick={() => setIsOpen(false)}>
-                Manage Permissions
-              </Link>
-              <Link to="/Roles" onClick={() => setIsOpen(false)}>
-                Manage Roles & Users
-              </Link>
-            </>
-          )}
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-90 z-50 flex flex-col justify-start">
+          <div className="flex justify-between items-center p-4 bg-blue-800 text-white">
+            <h2 className="text-2xl font-bold">WeStore</h2>
+            <button
+              onClick={toggleSidebar}
+              className="text-white text-2xl focus:outline-none"
+            >
+              <FaWindowClose />
+            </button>
+          </div>
+          <div className="p-6 space-y-6 text-white">
+            {userRole !== "admin" && userRole !== "super-admin" && (
+              <>
+                <Link
+                  to="/Shop"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="#"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Gaming
+                </Link>
+                <Link
+                  to="#"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  TVs
+                </Link>
+                <Link
+                  to="#"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Audio
+                </Link>
+                <Link
+                  to="#"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Phones
+                </Link>
+              </>
+            )}
+            {(userRole === "admin" || userRole === "super-admin") && (
+              <>
+                <Link
+                  to="/AnalyticsPage"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Analysis & Stock
+                </Link>
+                <Link
+                  to="/Data"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sales Data
+                </Link>
+                <Link
+                  to="/Permissions"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Manage Permissions
+                </Link>
+                <Link
+                  to="/Roles"
+                  className="block py-2 px-4 rounded hover:bg-blue-700 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Manage Roles & Users
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       )}
 
@@ -242,7 +301,7 @@ const Navigation = () => {
                 onClick={handleMakeSale}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
               >
-                Make Sale
+                Purchase
               </button>
             </div>
           </div>
